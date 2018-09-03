@@ -13,6 +13,11 @@
   debug:
     var: result.stdout
     verbosity: 0
+
+- name: remove {{ html_file_path }} directory
+  file:
+    path: "{{ html_file_path }}"
+    state: absent
     
 - name: copy HTML to Nginx
   shell: |
