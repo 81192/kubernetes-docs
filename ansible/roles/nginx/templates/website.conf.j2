@@ -1,0 +1,17 @@
+server {
+    listen       {{ nginx_http_listen_port }} default_server;
+    server_name  {{ nginx_server_name }};
+    root         {{ html_file_path }};
+    include /etc/nginx/default.d/*.conf;
+
+    location / {
+    }
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
+}
