@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>核心原理 &mdash; Kubernetes alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Kubernetes alpha documentation" href="../index.html"/>
+        <link rel="prev" title="部署手册" href="../deployment_guide/deployment_guide.html"/>
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Kubernetes
+          
+
+          
+            
+            <img src="../_static/kubernetes-logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../deployment_guide/deployment_guide.html">部署手册</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">核心原理</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#kubernetes">Kubernetes 架构</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#borg">Borg 简介</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Kubernetes 架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">分层架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">核心组件</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api">核心 API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">生态系统</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">设计原理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">设计概念</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">API 设计原则</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">控制机制设计原则</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">架构设计原则</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bootstrapping">引导（Bootstrapping）原则</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">核心技术概念和 API 对象</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pod">Pod</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#replication-controller-rc">复制控制器（Replication Controller，RC）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#replicaset-rs">副本集（ReplicaSet，RS）</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deployment">部署（Deployment）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Kubernetes</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>核心原理</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/core_principle/core_priciple.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>核心原理<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>介绍 Kubernetes 架构以及核心组件</p>
+<div class="section" id="kubernetes">
+<h2>Kubernetes 架构<a class="headerlink" href="#kubernetes" title="Permalink to this headline">¶</a></h2>
+<p>Kubernetes 最初源于谷歌内部的 Brog，提供了面向应用的容器集群部署和管理系统。Kubernetes 的目标旨在消除编排物理/虚拟计算，网络和存储基础设施的负担，并使应用程序运营商和开发人员完全将重点放在以容器为中心的原语上进行自助运营。</p>
+<p>Kubernetes 也提供稳定、兼容的基础（平台），用于构建定制化的 workflows 和更高级的自动化任务。Kubernetes 具备完善的集群管理能力，包括多层次的安全防护和准入机制、多组合应用支撑能力、透明的服务注册和服务发现机制、內建负载均衡器、故障发现和自我修复能力、服务滚动升级和在线扩容、可扩展的资源自动调度机制、多粒度的资源配额管理能力。Kubernentes 还提供完善的管理工具，涵盖开发、部署测试、运维监控等各个环节。</p>
+<div class="section" id="borg">
+<h3>Borg 简介<a class="headerlink" href="#borg" title="Permalink to this headline">¶</a></h3>
+<p>Borg 是谷歌内部的大规模集群管理系统，负责对谷歌内部很多核心的调度和管理。Borg 的目的是让用户能够不必操心资源管理的问题，让他们专注于自己的核心业务，并且做到跨多个数据中心的资源利用率最大化。</p>
+<p>Borg 主要由 BorgMaster、Borglet、Borgcfg 和 Scheduler 组成，如下图所示：</p>
+<img alt="../_images/borg.png" src="../_images/borg.png" />
+<ul class="simple">
+<li>BorgMaster 是整个集群的大脑，负责维护整个集群的状态，并将数据持久化到 Paxos 存储中；</li>
+<li>Scheduler 负责任务的调度，根据应用的特点将其调度到具体的机器上去；</li>
+<li>Borglet 负责真正运行任务（在容器中）</li>
+<li>Borgcfg 是Borg 的命令行工具，用于跟 Borg 系统交互，一般通过一个配置文件来提交任务。</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Kubernetes 架构<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Kubernetes 借鉴了 Borg 的设计概念，比如 Pod、Service、Labels 和单 Pod 单 IP 等。Kubernetes 的整体架构跟 Borg 非常像，如下图所示。</p>
+<img alt="../_images/kubernetes_architecture.png" src="../_images/kubernetes_architecture.png" />
+<p>Kubernetes 主要由以下几个核心组件组成：</p>
+<ul class="simple">
+<li>etcd 保存了整个集群的状态；</li>
+<li>kube-apiserver 提供了资源操作的唯一入口，并提供认证、授权、访问控制、API 注册和发现等机制；</li>
+<li>kube-controller-manager 负责维护集群的状态，比如故障检测、自动扩展、滚动更新等；</li>
+<li>kube-scheduler 负责资源的调度，按照预定的调度策略将 Pod 调度到相应的机器上；</li>
+<li>kubelet 负责维持容器的生命周期，同时也负责 Volume (CVI) 和网络（CNI）的管理；</li>
+<li>Container runtime 负责镜像管理以及 Pod 和容器的真正运行（CRI），默认的容器运行时为 Docker；</li>
+<li>kube-proxy 负责为 Service 提供 cluster 内部的服务发现和负载均衡；</li>
+</ul>
+<img alt="../_images/kebernetes_components.png" src="../_images/kebernetes_components.png" />
+<p>除了核心组件，还有一些推荐的 Add-ons:</p>
+<ul class="simple">
+<li>kube-dns 负责为整个集群提供 DNS 服务</li>
+<li>Ingress Controller 为服务提供外网入口</li>
+<li>Heapster 提供资源监控</li>
+<li>Dashboard 提供 GUI</li>
+<li>Federation 提供跨可用区的集群</li>
+<li>Fluentd-elasticsearch 提供集群日志采集、存储和查询</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>分层架构<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Kubernetes 设计理念和功能其实就是一个类似 Linux 的分层架构，如下图所示。</p>
+<img alt="../_images/kubernetes_layer.jpg" src="../_images/kubernetes_layer.jpg" />
+<ul>
+<li><p class="first">核心层：Kubernetets 最核心的功能，对外提供 API 构建高层的应用，对内提插件式应用执行环境</p>
+</li>
+<li><p class="first">应用层：部署（无状态应用、有状态应用、批处理任务、集群应用等）和路由（服务发现、DNS 解析等）</p>
+</li>
+<li><p class="first">管理层：系统度量（如基础设施、容器和网络的度量），自动化（如自动扩展、动态 Provision 等）以及策略管理（RBAC、Quota、PSP、NetworkPolicy等）</p>
+</li>
+<li><p class="first">接口层：kubectl 命令行工具、客户端 SDK 以及集群联邦</p>
+</li>
+<li><p class="first">生态系统：在接口层之上的庞大容器集群管理调度的生态系统，可以划分为两个范畴</p>
+<blockquote>
+<div><ul class="simple">
+<li>Kubernetes 外部：日志、监控、配置管理、CI、CD、WorkFlow、FaaS、OTS 应用、ChatOps 等。</li>
+<li>Kubernetes 内部：CRI、CNI、CVI、镜像仓库、Cloud Provider、集群自身的配置和管理等。</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>核心组件<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<img alt="../_images/core-packages.png" src="../_images/core-packages.png" />
+</div>
+<div class="section" id="api">
+<h3>核心 API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<img alt="../_images/core-apis.png" src="../_images/core-apis.png" />
+</div>
+<div class="section" id="id5">
+<h3>生态系统<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<img alt="../_images/core-ecosystem.png" src="../_images/core-ecosystem.png" />
+<p>关于分层架构，可以关注下 Kubernetes 社区正在推进的 <a class="reference external" href="https://github.com/kubernetes/community/tree/master/sig-architecture">Kubernetes 架构线路图</a></p>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>设计原理<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3>设计概念<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>分析和理解 Kubernetes 的设计理念可以使我们更深入的了解 Kubernetes 系统，更好地利用它管理分布式部署的云原生应用，另一方面也可以让我们借鉴其在分布式系统设计方面的经验。</p>
+</div>
+<div class="section" id="id9">
+<h3>API 设计原则<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>对于云计算系统，系统 API 实际上处于系统设计的统领地位。Kubernetes 集群系统每支持一项新功能，引入一项新技术，一定会新引入对应的 API 对象，支持对该功能的管理操作。理解掌握的 API，就好比抓住了 K8s 系统的牛鼻子。Kubernetes 系统 API 的设计有以下几条原则：</p>
+<ol class="arabic simple">
+<li>所有 API 应该是声明式的。声明式的操作，相对于命令式的操作，对于重复操作的效果是稳定的，这对于容易出现数据丢失或重复的分布式环境来说是很重要的。另外，声明式操作更容易被用户使用，可以使系统向用户隐藏实现的细节，同时也保留系统未来持久优化的可能性。此外，声明式的API还隐含了所有的 API 对象都是名词性质的，例如 Service、Volume 这些 API 都名词，这些名词描述了用户所期望得到的一个目标对象。</li>
+<li>API 对象是彼此互补而且可组合的。这实际上鼓励 API 对象尽量实现面向对象设计时的要求，即 “高内聚，松耦合”，对业务相关的概念有一个合适的分解，提高分解出来的对象的可重用性。</li>
+<li>高层 API 以操作意图为基础设计。如何能够设计好 API，跟如何能用面向对象的方法设计好应用系统相通的地方，高层设计一定是从业务出发，而不是过早的从技术实现出发。因此，针对 Kubernetes 的高层 API 设计，一定是以 K8s 的业务为基础出发，也就是以系统调度管理容器的操作意图为基础设计。</li>
+<li>低层 API 根据高层 API 的控制需要设计。设计实现低层 API 的目的，是为了被高层 API 使用，考虑减少冗余、提高重用性的目的，低层 API 的设计也要以需求为基础，要尽量抵抗受技术实现影响的诱惑。</li>
+<li>尽量避免简单封装，不要有在外部 API 无法显式知道的内部隐藏的机制。简单的封装，实际没有提供新的功能，反而增加了对所封装 API 的依赖性。内部隐藏的机制也是非常不利于系统维护的设计方式，例如 StatefulSet 和 ReplicaSet，本来就是两种 Pod 集合，那么 kubernetes 就用不同 API 对象来定义它们，而不会说只用同一个 ReplicaSet，内部通过特殊的算法再来区分这个 ReplicaSet 是有状态还是无状态。</li>
+<li>API 操作复杂度与对象数量成正比。这一条主要是从系统性能角度考虑，要保证整个系统随着系统规模的扩大，性能不会迅速变慢到无法使用，那么最低的限定就是 API 的操作复杂度不能超过 O(N)，N是对象的数量，否则系统就不具备水平伸缩性了。</li>
+<li>API 对象状态不能依赖于网络连接状态。由于众所周知，在分布式环境下，网络连接断开是经常发生的事情，因此要保证 API 对象状态能应对网络的不稳定，API 对象的状态就不能依赖对于网络连接状态。</li>
+<li>尽量避免让操作机制依赖全局状态，因为在分布式系统中要保证全局状态的同步数非常困难的。</li>
+</ol>
+</div>
+<div class="section" id="id10">
+<h3>控制机制设计原则<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">控制逻辑应该只依赖于当前状态</p>
+<p>这是为了保证分布式系统的稳定可靠，对于经常出现局部错误的分布式系统，如果控制逻辑只依赖当前状态，那么就非常容易将一个暂时出现故障的系统恢复到正常状态，因为你只要将该系统重置到某个稳定状态，就可以自信的知道系统的所有控制逻辑会开始按照正常方式运行。</p>
+</li>
+<li><p class="first">假设任何错误的可能，并做容错处理。</p>
+<p>在一个分布式系统中出现局部和临时错误是大概率事件。错误可能来自于物理系统故障，外部系统故障也可能来自于系统自身的代码错误，依靠自己实现的代码不会出错来保证系统稳定其实也是难以实现的，因此要设计对任何可能错误的容处理。</p>
+</li>
+<li><p class="first">尽量避免复杂状态机，控制逻辑不要依赖无法监控的内部状态。</p>
+<p>因为分布式系统各个子系统都是不能严格通过程序内部保持同步的，所以如果两个子系统的控逻辑如果相互有影响，那么子系统就一定要能够互相访问到影响控制逻辑的状态，否则，就等同于系统里存在不确定的控制逻辑。</p>
+</li>
+<li><p class="first">假设任何操作都可能被任何操作对象拒绝，甚至被错误解析。</p>
+<p>由于分布式系统的复杂性以及各子系统的相对独立性，不同子系统经常来自不能的开发团队，所以不能奢望任何操作被另一个子系统以正确的方式处理，要保证出现错误的时候，操作级别的错误不会影响到系统稳定性。</p>
+</li>
+<li><p class="first">每个模块都可以在出错后自动恢复。</p>
+<p>由于分布式系统中无法保证系统各个模块是始终连接的，因此每个模块要有自我修复的能力，保证不会因为连接不到其他模块而自我崩溃。</p>
+</li>
+<li><p class="first">每个模块都可以在必要时优雅地降级服务。</p>
+<p>所谓优雅地降级服务，是对系统鲁棒性的要求，即要求在设计实现模块时划分清楚基本功能和高级功能，保证基本功能不会依赖高级功能，这样同时就保证了不会因为高级功能出现故障而导致整个模块崩溃。根据这种理念实现的系统，也更容易快速地增加新的高级功能，因为不必担心引入高级功能影响原有的基本功能。</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h3>架构设计原则<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>只有 apiserver 可以直接访问 etcd 存储，其他的服务必须通过 Kubernetes API 来访问集群状态。</li>
+<li>单节点故障不应该影响集群的状态。</li>
+<li>在没有新请求的情况下，所有组件应该在故障恢复后继续执行上次最后收到的请求（比如网络分区或服务重启等）</li>
+<li>所有组件都应该在内存中保持所需要的状态，apiserver 将状态写入 etcd 存储，而其他组件则通过 apiserever 更新并监听所有的变化。</li>
+<li>优先使用事件监听而不是轮循</li>
+</ul>
+</div>
+<div class="section" id="bootstrapping">
+<h3>引导（Bootstrapping）原则<a class="headerlink" href="#bootstrapping" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Self-hosting 是目标</li>
+<li>减少依赖，特别是稳定运行的依赖</li>
+<li>通过分层的原则管理依赖</li>
+<li>循环依赖问题的原则<ul>
+<li>同时还接受其他方式的数据输入（比如本地文件等），这样在其他服务不可用时还可以手动配置引导服务</li>
+<li>状态应该是可恢复或可重新发现的</li>
+<li>支持简单的启动临时实例来创建稳态运行所需要的状态；使用分布式锁或文件锁来协调不同状态的切换（通常称为 <code class="docutils literal notranslate"><span class="pre">pivoting</span></code> 技术）</li>
+<li>自动重启异常退出的服务，比如副本或者进程管理器等</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h3>核心技术概念和 API 对象<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>API 对象是 K8s 集群中的管理操作单元。K8s 集群系统每支持一项新功能，引入一项新技术，一定会新引入对应的 API 对象，支持对该功能的管理操作。例如副本集 ReplicaSet 对应的 API 对象是 RS。</p>
+<p>每个 API 对象都有 3 大类属性：元数据 metadata、规范 spec 和状态 status。元数据是用来标识 API 对象的，每个对象都至少有3个元数据：namespace,name 和 uid；除此以外还有各种各样的标签 labels 用来标识和匹配不同的对象，例如用户可以用标签 env 来标识区分不同的服务部署环境，分别用 <code class="docutils literal notranslate"><span class="pre">env=dev</span></code> <code class="docutils literal notranslate"><span class="pre">env=testing</span></code> <code class="docutils literal notranslate"><span class="pre">env=production</span></code> 来标识开发、测试、生产的不同服务。规范描述了用户期望 K8s 集群中的分布式系统达到的理想状态（Desired State），例如用户可以通过复制控制器 Replication Controller 设置期望的 Pod 副本数为 3；status 描述了系统实际当前达到的状态（Status），例如系统当前实际的 Pod 副本数为 2；那么复本控制器当前的程序逻辑就是自动启动新的 Pod，争取达到复本数为 3。</p>
+<p>K8s 中所有的配置都是通过 API 对象的 spec 去设置的，也就是用户通过配置系统的理想状态来改变系统，这是 K8s 重要设计理念之一，即所有的操作都是声明式（Declarative）的而不是命令式（Imperative）的。声明式操作在分布式系统中的好处是稳定，不怕丢操作或运行多次，例如设置副本数为 3 的操作运行多次也还是一个结果，而给副本数加1的操作就不是声明式的，运行多次结果就错了。</p>
+</div>
+<div class="section" id="pod">
+<h3>Pod<a class="headerlink" href="#pod" title="Permalink to this headline">¶</a></h3>
+<p>K8s 有很多技术概念，同时对应很多 API 对象，最重要的也是最基础的是微服务Pod。Pod 是在 K8s 集群中运行部署应用或服务的最小单元，它是可以支持多容器的。Pod 的设计概念是支持多个容器在一个 Pod 中共享网络地址和文件系统，可以通过进程间通信和文件共享这种简单高效的方式组合完成服务。Pod 对多容器的支持是 K8s 最基础的设计理念。比如你运行一个操作系统发行版的软件仓库，一个 Nginx 容器用来发布软件，另一个容器专门用来从源仓库做同步，这两个容器的镜像不太可能是一个团队开发的，但是他们一块工作才能提供一个微服务；这种情况下，不同团队各自开发构建自己的容器镜像，在部署的时候组合成一个微服务对外提供服务。</p>
+<p>Pod 是 K8s 集群中所有业务类型的基础，可以看作运行在 K8s 集群中的小机器人，不同类型的业务就需要不同类型的小机器人去执行。目前 K8s 中的业务主要可以分为长期伺服器（long-running）、批处理型（batch）、节点后台支撑型（node-daemon）和有状态应用型（stateful application）；分别对应的小机器人控制器为 Deployment、Job、DaemonSet 和 StatefulSet，本文后面会一一介绍。</p>
+</div>
+<div class="section" id="replication-controller-rc">
+<h3>复制控制器（Replication Controller，RC）<a class="headerlink" href="#replication-controller-rc" title="Permalink to this headline">¶</a></h3>
+<p>RC 是 K8s 集群中最早的保证 Pod 高可用的 API 对象。通过监控运行中的 Pod 来保证集群中运行指定数目的 Pod 副本。指定的数目可以是多个也可以是一个；少于指定数目，RC 就会启动运行新的 Pod 副本；多于指定数目，RC 就会杀死多余的 Pod 副本。即使指定数目为1的情况下，通过 RC 运行 Pod 也比直接运行 Pod 更加明智，因为 RC 也可以发挥它高可用的能力，保证永远有1个Pod在运行。RC 是 K8s 较早期的基础概念，只适用于长期伺服型的业务类型，比如控制小机器人提供高可用的 Web 服务。</p>
+</div>
+<div class="section" id="replicaset-rs">
+<h3>副本集（ReplicaSet，RS）<a class="headerlink" href="#replicaset-rs" title="Permalink to this headline">¶</a></h3>
+<p>RS 是新一代的 RC，提供同样的高可用能力，区别主要在于RS后来居上，能支持更多种类的匹配模式。副本集对象一般不单独使用，而是作为 Deployment 的理想状态参数使用。</p>
+</div>
+<div class="section" id="deployment">
+<h3>部署（Deployment）<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h3>
+<p>部署表示用户对 K8s 集群的一次更新操作</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../deployment_guide/deployment_guide.html" class="btn btn-neutral" title="部署手册" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, renkeju.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

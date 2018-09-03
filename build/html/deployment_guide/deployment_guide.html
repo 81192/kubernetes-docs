@@ -1,0 +1,942 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>部署手册 &mdash; Kubernetes alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Kubernetes alpha documentation" href="../index.html"/>
+        <link rel="prev" title="欢迎来到 kubernetes 手册" href="../index.html"/>
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Kubernetes
+          
+
+          
+            
+            <img src="../_static/kubernetes-logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">部署手册</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">kubespray</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">入门</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#inventory">建立自己的 inventory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">开始自定义部署</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">添加节点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">删除节点</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kubernetes">连接到 Kubernetes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">访问 Kubernetes 仪表盘</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kubernetes-api">访问 Kubernetes API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#k8s-ha">k8s HA 端点</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etcd">Etcd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kube-apiserver">Kube-apiserver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#kubespary-kubernetes">在 Kubespary 中升级 Kubernetes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id11">描述</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">不安全的升级示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id13">优雅的升级</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">升级管理</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id15">升级注意事项</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id16">基于组件的升级</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">下载二进制文件和容器</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id18">支持多种 上传/下载 方式</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id19">拉取一次 多次推送 模式</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ansible">Ansible 变量</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id20">Inventory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id21">组变量和覆盖优先级变量</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id22">Ansible 标签</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id23">命令示例</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id24">堡垒主机</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Kubernetes</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>部署手册</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/deployment_guide/deployment_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>部署手册<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>github 项目 <a class="reference external" href="https://github.com/kelseyhightower/kubernetes-the-hard-way">kubernetes-the-hard-way</a> 详细介绍了如何一步步安装 kubernetes，但如果你想快速的部署 kubernetes 集群环境并且已经对 ansible 非常的熟悉，可以使用 github 项目 <a class="reference external" href="https://github.com/kubernetes-incubator/kubespray">kubespray</a> 来部署环境。在此手动部署 kubernetes 细节不在赘述。</p>
+<div class="section" id="id2">
+<h2>kubespray<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>部署一个生产就绪的 kubernetets 集群</p>
+<ul class="simple">
+<li>可以在 AWS、GCE、Azure、OpenStack、vSphere、Oracle Cloud Infrastructure (Experimental) 或裸金属服务器上部署</li>
+<li>高可用集群</li>
+<li>可组合（为实例选择网络插件类型）</li>
+<li>支持最流行的 Linux 发行版</li>
+<li>持续集成测试</li>
+</ul>
+<div class="section" id="id3">
+<h3>入门<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="inventory">
+<h4>建立自己的 inventory<a class="headerlink" href="#inventory" title="Permalink to this headline">¶</a></h4>
+<p>Ansible inventory 可以使用三种格式存储：YAML、JSON 或 INI-like。查看示例 inventory 点击 <a class="reference external" href="https://github.com/kubernetes-incubator/kubespray/blob/master/inventory/sample/hosts.ini">这里</a> 。</p>
+<p>你可以使用 <a class="reference external" href="https://github.com/kubernetes-incubator/kubespray/blob/master/contrib/inventory_builder/inventory.py">inventory generator</a> 去创建或修改 Ansible inventory。 目前，它的功能有限，仅用于配置基本的 Kubespray Cluster Inventory，但它也支持为大型集群创建 Inventory 文件。 如果大小超过某个阈值，它现在支持从节点角色分离 ETCD 和 Kubernetes Master 角色。 运行 <cite>python3 contrib/inventory_builder/inventory.py help</cite> 帮助获取更多信息。</p>
+<p>inventory generator 使用示例：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp -r inventory/sample inventory/mycluster
+<span class="nb">declare</span> -a <span class="nv">IPS</span><span class="o">=(</span><span class="m">10</span>.10.1.3 <span class="m">10</span>.10.1.4 <span class="m">10</span>.10.1.5<span class="o">)</span>
+<span class="nv">CONFIG_FILE</span><span class="o">=</span>inventory/mycluster/hosts.ini python3 contrib/inventory_builder/inventory.py <span class="si">${</span><span class="nv">IPS</span><span class="p">[@]</span><span class="si">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h4>开始自定义部署<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>一旦你有了 Inventory 之后，你可能希望自定部署数据并开始部署。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">通过编辑 <code class="docutils literal notranslate"><span class="pre">my_inventory/groups_vars/*.yaml</span></code> 来覆盖变量数据。</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/mycluster/hosts.ini cluster.yml -b -v <span class="se">\</span>
+  --private-key<span class="o">=</span>~/.ssh/private_key
+</pre></div>
+</div>
+<p>可以从 <a class="reference internal" href="#ansible">Ansible 变量</a> 查看更多的细节。</p>
+</div>
+<div class="section" id="id6">
+<h4>添加节点<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>你可能希望将 worker、master 或 etcd 节点添加到现有集群。这可以通过重新运行 <code class="docutils literal notranslate"><span class="pre">cluster.yml</span></code> playbook 来完成，或者你可以针对在 worker 上安装 kubelet 并从你的 master 计算出所需要的最低限制。在执行类似自动缩放的操作时，这尤为重要。</p>
+<ul>
+<li><p class="first">将新工作线程节点添加到相应组中的 invertory （或使用 <a class="reference external" href="https://docs.ansible.com/ansible/intro_dynamic_inventory.html">dynamic inventory</a> ）</p>
+</li>
+<li><p class="first">运行 ansible-playbook 命名，把 <cite>cluster.yml</cite> 替换为 <cite>scale.yml</cite>。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/mycluster/hosts.ini scale.yml -b -v <span class="se">\</span>
+  --private-key<span class="o">=</span>~/.ssh/private_key
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h4>删除节点<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>你可能希望将 <cite>worker</cite> 节点从现有集群中移除。这可以通过重新运行 <code class="docutils literal notranslate"><span class="pre">remove-node.yml</span></code> playbook 来实现。首先，将排空所有节点，然后停止一些 kubernetes 服务并删除一些证书，最后执行 kubectl 命令删除这些节点。这可以与添加节点功能结合使用。这在执行自动缩放集群等操作时通常很有用。当然，如果节点不能工作，您可以删除该节点并再次安装它。</p>
+<p>如果要删除 worker 节点（或使用 <a class="reference external" href="https://docs.ansible.com/ansible/intro_dynamic_inventory.html">dynamic inventory</a> ），请将 worker 节点添加到 kube-node 下的列表中。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/mycluster/hosts.ini remove-node.yml -b -v <span class="se">\</span>
+  --private-key<span class="o">=</span>~/.ssh/private_key
+</pre></div>
+</div>
+<p>我们支持两种方式来选择节点：</p>
+<ul class="simple">
+<li>使用 <code class="docutils literal notranslate"><span class="pre">--extra-vars</span> <span class="pre">&quot;node=&lt;nodename&gt;,&lt;nodename2&gt;&quot;</span></code> 选择要删除的节点</li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/mycluster/hosts.ini remove-node.yml -b -v <span class="se">\</span>
+  --private-key<span class="o">=</span>~/.ssh/private_key <span class="se">\</span>
+  --extra-vars <span class="s2">&quot;node=nodename,nodename2&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>使用 <code class="docutils literal notranslate"><span class="pre">--limit</span> <span class="pre">nodename,nodename2</span></code> 选择要删除的节点</li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/mycluster/hosts.ini remove-node.yml -b -v <span class="se">\</span>
+  --private-key<span class="o">=</span>~/.ssh/private_key <span class="se">\</span>
+  --limit nodename,nodename2<span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="kubernetes">
+<h4>连接到 Kubernetes<a class="headerlink" href="#kubernetes" title="Permalink to this headline">¶</a></h4>
+<p>默认情况下，Kubespray 通过 8080 端口配置对 kube-apiserver 不安全访问的 kube-master 主机。这种情况下，不需要 kubeconfig 文件，因为 kubectl 将使用 &lt;<a class="reference external" href="http://localhost:8080">http://localhost:8080</a>&gt; 进行连接。生成的 kubeconfig 文件将指向 localhost（在 kube-masters 上），并且 kube-node 主机将连接到 localhost nginx 代理或连接到负载均衡器（如果已配置）。[HA 指南](ha-mode.md) 中有关此过程的更多详细信息。</p>
+<p>Kubespray 允许在端口 6443 上的任何 kube-master 主机的任何 IP 上远程连接到集群。但是，这需要身份验证。可以基于一个已安装 kube-master 主机（需要改进）生成 kubeconfig，或者使用用户名和密码进行连接。默认情况下，创建具有管理员权限的名为 kube 的用户。通过查看文件 <code class="docutils literal notranslate"><span class="pre">PATH_TO_KUBESPRAY/kube_user.creds</span></code>，可以在部署后查看密码。这包含随机生成的密码。如果你想设置自己的密码，只需自己预先创建/修改此文件。</p>
+<p>有关 kubeconfig 和访问 Kubernetes 集群的更多信息，请参阅 Kubernetes <a class="reference external" href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/">文档</a> 。</p>
+</div>
+<div class="section" id="id10">
+<h4>访问 Kubernetes 仪表盘<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<p>截止 kubernetes-dashboard v1.7.x:</p>
+<ul class="simple">
+<li>默认情况下使用 token/basic/kubeconfig 的 apiserver auth 代理新的登录选项</li>
+<li>在 authorization_modes 中需要 RBAC</li>
+<li>仅适用于 HTTPS</li>
+<li>在使用 https 代理 URL 更新 apiserver 之前，&lt;<a class="reference external" href="https://first_master:6443/ui">https://first_master:6443/ui</a>&gt; 不再可用。</li>
+</ul>
+<p>如果设置了变量 dashboard_enabled（默认为 true），则可以通过以下 URL 访问 Kubernetes 仪表盘，系统将提示输入凭据：&lt;<a class="reference external" href="https://first_master:6443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login">https://first_master:6443/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login</a>&gt;</p>
+<p>或者你可以从本地计算机运行 “kubectl proxy” 以访问浏览器中的仪表盘：&lt;<a class="reference external" href="http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login">http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login</a>&gt;</p>
+<p>建议从强制执行身份验证令牌的网关（如 Ingress Controller）后面访问仪表盘。详细信息和其他访问选项：&lt;<a class="reference external" href="https://github.com/kubernetes/dashboard/wiki/Accessing-Dashboard---1.7.X-and-above">https://github.com/kubernetes/dashboard/wiki/Accessing-Dashboard—1.7.X-and-above</a>&gt;</p>
+</div>
+<div class="section" id="kubernetes-api">
+<h4>访问 Kubernetes API<a class="headerlink" href="#kubernetes-api" title="Permalink to this headline">¶</a></h4>
+<p>Kubernetes 的主要客户是 <code class="docutils literal notranslate"><span class="pre">kubectl</span></code>。它安装在每个 kube-master 主机上，可以选择在 ansible 主机上配置，方法是在配置中设置 <code class="docutils literal notranslate"><span class="pre">kubectl_localhost:</span> <span class="pre">true</span></code> 和 <code class="docutils literal notranslate"><span class="pre">kubeconfig_localhost:</span> <span class="pre">true</span></code> 。</p>
+<ul class="simple">
+<li>如果开启 <code class="docutils literal notranslate"><span class="pre">kubectl_localhost</span></code>， <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> 将会下载到 <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/</span></code> 并通过 bash 完成设置。 还使用以下 <code class="docutils literal notranslate"><span class="pre">admin.conf</span></code> 为安装程序创建了一个帮助程序脚本 <code class="docutils literal notranslate"><span class="pre">inventory/mycluster/artifacts/kubectl.sh</span></code></li>
+<li>如果开启 <code class="docutils literal notranslate"><span class="pre">kubectl_localhost</span></code>, <code class="docutils literal notranslate"><span class="pre">admin.conf</span></code> 将在部署后出现在 <code class="docutils literal notranslate"><span class="pre">inventory/mycluster/artifacts/</span></code> 目录中。</li>
+</ul>
+<p>您可以通过运行以下命令来查看节点列表：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> inventory/mycluster/artifacts
+./kubectl.sh get nodes
+</pre></div>
+</div>
+<p>如果需要，请将 <code class="docutils literal notranslate"><span class="pre">admin.conf</span></code> 复制到 <code class="docutils literal notranslate"><span class="pre">~/.kube/config</span></code> 目录中。</p>
+</div>
+</div>
+<div class="section" id="k8s-ha">
+<h3>k8s HA 端点<a class="headerlink" href="#k8s-ha" title="Permalink to this headline">¶</a></h3>
+<p>以下组件需要高可用性端点：</p>
+<ul class="simple">
+<li>etcd 集群</li>
+<li>kube-apiserver 服务实例</li>
+</ul>
+<p>后者依赖于第三方反向代理，如 Nginx 或 HAProxy，以实现相同的目标。</p>
+<div class="section" id="etcd">
+<h4>Etcd<a class="headerlink" href="#etcd" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">etcd_access_endpoint</span></code> 实际上为客户端提供了访问模式。 并且 <code class="docutils literal notranslate"><span class="pre">etcd_multiaccess``（默认为True）Ansible</span> <span class="pre">``group_vars</span></code> 控制该行为。它使部署的组件直接访问etcd集群成员： <code class="docutils literal notranslate"><span class="pre">http://ip1:2379,</span> <span class="pre">http://ip2:2379,...</span></code>. 此模式假定客户端执行负载均衡并处理连接的HA。</p>
+</div>
+<div class="section" id="kube-apiserver">
+<h4>Kube-apiserver<a class="headerlink" href="#kube-apiserver" title="Permalink to this headline">¶</a></h4>
+<p>k8s 组件需要负载均衡器通过反向代理访问 apiserver。Kubespray 包括对基于 nginx 的代理的支持，该代理驻留在每个非主kubernetses节点上。这称为 localhost 负载均衡。它比专用负载均衡器效率低，因为它在 Kubernetes apiserver 上创建了额外的运行状态监测，但对于外部LB或虚拟IP管理不方便的情况更为实用。<code class="docutils literal notranslate"><span class="pre">loadbalancer_apiserver_localhost</span></code> 配置（默认为 True。如果定义了外部 <code class="docutils literal notranslate"><span class="pre">loadbalancer_apiserver</span></code>，则为 False）。你还可以通过更改 <code class="docutils literal notranslate"><span class="pre">nginx_kube_apiserver_port</span></code> 来定义本地内部负载均衡器使用的端口。默认值为 <code class="docutils literal notranslate"><span class="pre">kube_apiserver_port</span></code>。同样重要的注意Kubespray 将仅在非主节点上配置 kubelet 和 kube-proxy 以使用本地内部负载均衡器。</p>
+<p>如果您选择不使用本地内部负载均衡器，则需要配置自己的负载均衡器以实现 HA。请注意，部署负载均衡器取决于用户，并且不受Kubespary 中 ansible 角色的影响。默认情况下，它仅配置非 HA 端点，该端点指向 <cite>kube-master</cite> 组中第一个第一个服务器节点的 <code class="docutils literal notranslate"><span class="pre">access_ip</span></code> 或 IP 地址。它还可以将客户端配置为使用给定负载均衡器类型的端点。下图显示了如何定向到apiserver的流量。</p>
+<img alt="../_images/loadbalancer_localhost.png" src="../_images/loadbalancer_localhost.png" />
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">Kubernetes主节点仍然使用不安全的本地主机访问，因为在主角色服务上使用TLS身份验证时，<cite>Kubernetes &lt; 1.5.0</cite> 中存在错误。 这使得后端接收未加密的流量，并且在互连不同节点时可能是安全问题，或者如果那些属于没有外部访问的隔离管理网络则可能是安全问题。</p>
+</div>
+<p>用户可以选择使用外部负载均衡器（LB）。外部LB为外部客户端提供访问权限，而内部LB仅接受客户端连接到本地主机。 给定前端 <code class="docutils literal notranslate"><span class="pre">VIP</span></code> 地址和后端的 <cite>IP1,IP2</cite> 地址，这里是作为外部 LB 的 HAProxy 服务的示例配置：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    chroot /var/lib/haproxy
+    stats socket /var/run/haproxy.pid mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+    nbproc 1
+
+defaults
+    log     global
+    timeout connect 5000
+    timeout client  10m
+    timeout server  10m
+
+listen  admin_stats
+    bind 0.0.0.0:8080
+    mode http
+    log 127.0.0.1 local0 err
+    stats refresh 30s
+    stats uri /status
+    stats realm welcome login\ Haproxy
+    stats auth admin:123456
+    stats hide-version
+    stats admin if TRUE
+
+listen kube-master
+    bind &lt;VIP&gt;:8443
+    mode tcp
+    option ssl-hello-chk
+    balance roundrobin
+    server kube-master-1 &lt;IP1&gt;:6443 check inter 2000 fall 2 rise 2 weight 1
+    server kube-master-1 &lt;IP2&gt;:6443 check inter 2000 fall 2 rise 2 weight 1
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">这是在Kubespray之外的其他地方管理的示例配置。</p>
+</div>
+<p>以及在Kubespray中配置集群API访问模式的“群集感知”外部LB的相应示例全局变量：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>apiserver_loadbalancer_domain_name: &quot;my-apiserver-lb.example.com&quot;
+loadbalancer_apiserver:
+  address: &lt;VIP&gt;
+  port: 8443
+</pre></div>
+</div>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">默认的 kubernetes apiserver 配置绑定到所有接口，因此您需要为API正在侦听的vip使用不同的端口，或者设置 <cite>kube_apiserver_bind_address</cite> 以便API仅侦听特定接口（以避免冲突）用haproxy绑定VIP地址上的端口</p>
+</div>
+<p>此域名或默认”lb-apiserver.kubernetes.local”将插入到 k8s-cluster 组中所有服务器的 <cite>/etc/hosts</cite> 文件中，并连接到生成的自签名 TLS/SSL 证书。请注意，HAProxy服务也应该是HA并且需要VIP管理，这超出了本文档的范围。</p>
+<blockquote>
+<div><div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">对于这种情况，Kubespray 不会生成外部访问的API端点的 TLS/SSL 证书。 确保您的外部LB提供它。 或者，您可以在 <cite>supplement_addresses_in_ssl_keys</cite> 列表中指定外部负载均衡的 VIP。 然后，kubespray 也会将它们添加到生成的集群证书中。</p>
+</div>
+</div></blockquote>
+<p>除了特定情况之外，<cite>loadbalancer_apiserver</cite> 被认为与 <cite>loadbalancer_apiserver_localhost</cite> 互斥的。</p>
+<p>访问API端点会被自动评估，如下所示：</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="18%" />
+<col width="24%" />
+<col width="24%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Endpoint type</th>
+<th class="head">kube-master</th>
+<th class="head">non-master</th>
+<th class="head">external</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Local LB (default)</td>
+<td><a class="reference external" href="https://bip:sp">https://bip:sp</a></td>
+<td><a class="reference external" href="https://lc:nsp">https://lc:nsp</a></td>
+<td><a class="reference external" href="https://m[0].aip:sp">https://m[0].aip:sp</a></td>
+</tr>
+<tr class="row-odd"><td>Local LB + Unmanaged here LB</td>
+<td><a class="reference external" href="https://bip:sp">https://bip:sp</a></td>
+<td><a class="reference external" href="https://lc:nsp">https://lc:nsp</a></td>
+<td><a class="reference external" href="https://ext">https://ext</a></td>
+</tr>
+<tr class="row-even"><td>External LB, no internal</td>
+<td><a class="reference external" href="https://bip:sp">https://bip:sp</a></td>
+<td><a class="reference external" href="https://lb:lp">https://lb:lp</a></td>
+<td><a class="reference external" href="https://lb:lp">https://lb:lp</a></td>
+</tr>
+<tr class="row-odd"><td>No ext/int LB</td>
+<td><a class="reference external" href="https://bip:sp">https://bip:sp</a></td>
+<td><a class="reference external" href="https://m[0].aip:sp">https://m[0].aip:sp</a></td>
+<td><a class="reference external" href="https://m[0].aip:sp">https://m[0].aip:sp</a></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">m[0]</span></code> - <cite>kube-master</cite> 组中第一个节点；</li>
+<li><code class="docutils literal notranslate"><span class="pre">lb</span></code> - LB FQDN（全局限定域名）, <cite>apiserver_loadbalancer_domain_name</cite>；</li>
+<li><code class="docutils literal notranslate"><span class="pre">ext</span></code> - Externally load balanced VIP:port and FQDN, not managed by Kubespray；</li>
+<li><code class="docutils literal notranslate"><span class="pre">lc</span></code> - localhost；</li>
+<li><code class="docutils literal notranslate"><span class="pre">bip</span></code> - 自定义绑定 IP 地址或 localhost 用于默认绑定IP ‘0.0.0.0’；</li>
+<li><code class="docutils literal notranslate"><span class="pre">nsp</span></code> - nginx 安全端口, <cite>nginx_kube_apiserver_port</cite>, 默认与 <cite>sp</cite> 相同；</li>
+<li><code class="docutils literal notranslate"><span class="pre">sp</span></code> - 安全端口, <cite>kube_apiserver_port</cite>；</li>
+<li><code class="docutils literal notranslate"><span class="pre">lp</span></code> - LB 端口, <cite>loadbalancer_apiserver.port</cite>，遵循安全端口；</li>
+<li><code class="docutils literal notranslate"><span class="pre">ip</span></code> - 节点IP，遵循 ansible inventory 文件中 IP 地址；</li>
+<li><code class="docutils literal notranslate"><span class="pre">aip</span></code> - 遵循 <cite>access_ip</cite> 定义的 IP 地址。</li>
+</ul>
+<p>第二列和第三列表示内部群集访问模式。最后一列说明了从外部访问集群API的示例URI。 Kubespray 与它无关，这只是信息性的。</p>
+<p>如您所见，主服务器的内部API端点始终通过本地绑定IP联系，即 <cite>https://bip:sp</cite>。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">对于某些情况，如 Kubespray 部署的应用程序的健康检查，主节点的 API 可通过不安全的端点访问，该端点由本地 <code class="docutils literal notranslate"><span class="pre">kube_apiserver_insecure_bind_address</span></code> 和 <code class="docutils literal notranslate"><span class="pre">kube_apiserver_insecure_port</span></code>。</p>
+</div>
+</div>
+</div>
+<div class="section" id="kubespary-kubernetes">
+<h3>在 Kubespary 中升级 Kubernetes<a class="headerlink" href="#kubespary-kubernetes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h4>描述<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<p>Kubespray 处理升级的方式与处理初始部署的方式相同。 也就是说，每个组件都按固定顺序放置。
+您应该可以毫无困难地在 Kubespray 把当前集群升级到 tags 2.0。 您还可以通过显式定义其版本来单独控制组件的版本。</p>
+<p>以下是每个组件的所有版本变量：</p>
+<ul class="simple">
+<li>docker_version</li>
+<li>kube_version</li>
+<li>etcd_version</li>
+<li>calico_version</li>
+<li>calico_cni_version</li>
+<li>weave_version</li>
+<li>flannel_version</li>
+<li>kubedns_version</li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h4>不安全的升级示例<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<p>如果您只想将 kube_version 从 v1.4.3 升级到 v1.4.6，则可以采用以下方式进行部署：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ansible-playbook cluster.yml -i inventory/sample/hosts.ini -e kube_version=v1.4.3
+</pre></div>
+</div>
+<p>然后重复用 v1.4.6 作为 kube_version：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ansible-playbook cluster.yml -i inventory/sample/hosts.ini -e kube_version=v1.4.6
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h4>优雅的升级<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<p>Kubespray还支持在执行群集升级时对节点进行锁定，排空和取消协调。有一个单独的 playbook 用于此目的。请务必注意，upgrade-cluster.yml 只能用于升级现有群集。这意味着必须至少部署了1个kube-master。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git fetch origin
+git checkout origin/master
+ansible-playbook upgrade-cluster.yml -b -i inventory/sample/hosts.ini -e <span class="nv">kube_version</span><span class="o">=</span>v1.6.0
+</pre></div>
+</div>
+<p>成功升级后，查看更新服务器版本：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ kubectl version
+Client Version: version.Info<span class="o">{</span>Major:<span class="s2">&quot;1&quot;</span>, Minor:<span class="s2">&quot;6&quot;</span>, GitVersion:<span class="s2">&quot;v1.6.0&quot;</span>, GitCommit:<span class="s2">&quot;fff5156092b56e6bd60fff75aad4dc9de6b6ef37&quot;</span>, GitTreeState:<span class="s2">&quot;clean&quot;</span>, BuildDate:<span class="s2">&quot;2017-03-28T19:15:41Z&quot;</span>, GoVersion:<span class="s2">&quot;go1.8&quot;</span>, Compiler:<span class="s2">&quot;gc&quot;</span>, Platform:<span class="s2">&quot;darwin/amd64&quot;</span><span class="o">}</span>
+Server Version: version.Info<span class="o">{</span>Major:<span class="s2">&quot;1&quot;</span>, Minor:<span class="s2">&quot;6&quot;</span>, GitVersion:<span class="s2">&quot;v1.6.0+coreos.0&quot;</span>, GitCommit:<span class="s2">&quot;8031716957d697332f9234ddf85febb07ac6c3e3&quot;</span>, GitTreeState:<span class="s2">&quot;clean&quot;</span>, BuildDate:<span class="s2">&quot;2017-03-29T04:33:09Z&quot;</span>, GoVersion:<span class="s2">&quot;go1.7.5&quot;</span>, Compiler:<span class="s2">&quot;gc&quot;</span>, Platform:<span class="s2">&quot;linux/amd64&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id14">
+<h4>升级管理<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<p>如上所述，组件按照它们在Ansible playbook中的安装顺序进行升级。组件安装顺序如下：</p>
+<ul class="simple">
+<li>Docker</li>
+<li>etcd</li>
+<li>kubelet and kube-proxy</li>
+<li>network_plugin (such as Calico or Weave)</li>
+<li>kube-apiserver, kube-scheduler, and kube-controller-manager</li>
+<li>Add-ons (such as KubeDNS)</li>
+</ul>
+</div>
+<div class="section" id="id15">
+<h4>升级注意事项<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<p>Kubespray 支持用于etcd和Kubernetes 组件的轮换证书，但可能需要一些手动操作步骤。
+如果您的 pod 需要使用服务令牌并部署在 kube-system 以外的命名空间中，则需要在轮换证书后手动删除受影响的pod。
+这是因为所有服务帐户令牌都依赖于用于生成它们的 apiserver 令牌。
+证书轮换时，所有服务帐户 token 也必须轮换。 在 kubernetes-apps/rotate_tokens 角色期间，只有 kube-system 中的 pod 被销毁并重新创建。
+所有其他无效的服务帐户令牌都会自动清理，但是对于对用户部署的pod的影响，其他pod不会被删除。</p>
+</div>
+<div class="section" id="id16">
+<h4>基于组件的升级<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<p>部署者可能希望升级特定组件以最小化风险或节省时间。
+在撰写本文时，CI 不涵盖此策略，因此无法保证其正常运行。</p>
+<p>这些命令仅对升级完全部署的健康现有主机有用。
+这对于未部署或部分部署的主机肯定不起作用。</p>
+<p>Upgrade docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>docker
+</pre></div>
+</div>
+<p>Upgrade etcd:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>etcd
+</pre></div>
+</div>
+<p>Upgrade vault:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>vault
+</pre></div>
+</div>
+<p>Upgrade kubelet:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>node --skip-tags<span class="o">=</span>k8s-gen-certs,k8s-gen-tokens
+</pre></div>
+</div>
+<p>Upgrade Kubernetes master components:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>master
+</pre></div>
+</div>
+<p>Upgrade network plugins:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>network
+</pre></div>
+</div>
+<p>Upgrade all add-ons:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>apps
+</pre></div>
+</div>
+<p>仅升级 helm（假设 helm_enabled 为 true）：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook -b -i inventory/sample/hosts.ini cluster.yml --tags<span class="o">=</span>helm
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id17">
+<h3>下载二进制文件和容器<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h4>支持多种 上传/下载 方式<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>每个节点自己下载二进制文件和容器图像，即 <code class="docutils literal notranslate"><span class="pre">download_run_once:</span> <span class="pre">False</span></code> 。</li>
+<li>对于K8s应用程序，拉取策略是如果不存在则拉取 <code class="docutils literal notranslate"><span class="pre">k8s_image_pull_policy:</span> <span class="pre">IfNotPresent</span></code> 。</li>
+<li>对于系统管理的容器，如 kubelet 或 etcd，拉取策略是 <code class="docutils literal notranslate"><span class="pre">download_always_pull:</span> <span class="pre">False</span></code> ，如果只要有的 repo 和 <cite>tag/sha256 digest</cite> 与主机容器有所不同，就会拉取。</li>
+</ul>
+</div>
+<div class="section" id="id19">
+<h4>拉取一次 多次推送 模式<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>更改为 <code class="docutils literal notranslate"><span class="pre">download_run_once：True</span></code> 仅下载容器映像一次，然后批量推送到群集节点，推送图像的默认委托节点是第一个 kube-master。</li>
+<li>如果您的 <cite>ansible runner</cite> 节点（也称为admin节点）启用了无密码 sudo 和 docker，您可以定义 <code class="docutils literal notranslate"><span class="pre">download_localhost：True</span></code> ，这使得该节点成为在使用 ansible 运行部署时推送映像的委托。如果无法通过 ssh 访问到集群中的每个节点，或者您希望将本地 docker 镜像用作多个群集的缓存，则可能就是这种情况。</li>
+</ul>
+<p>容器镜像和二进制文件由诸如 <cite>foo_version</cite>，<cite>foo_download_url</cite>，<cite>foo_checksum`（用于二进制文件）和 `foo_image_repo</cite>，<cite>foo_image_tag</cite> 或容器的可选 <cite>foo_digest_checksum</cite> 等变量描述。</p>
+<p>容器图像可以通过其 repo 和 tag 来定义，例如：<cite>andyshinn/dnsmasq:2.72</cite>。或者通过 repo 和 tag 以及 sha256 digest：<a class="reference external" href="mailto:andyshinn/dnsmasq&#37;&#52;&#48;sha256">andyshinn/dnsmasq<span>&#64;</span>sha256</a>:7c883354f6ea9876d176fe1d30132515478b2859d6fc0cbf9223ffdc09168193。</p>
+<p>请注意，sha256 digest 和镜像标记必须同时指定并相互对应。上面给出的示例由以下变量表示：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dnsmasq_digest_checksum: 7c883354f6ea9876d176fe1d30132515478b2859d6fc0cbf9223ffdc09168193
+dnsmasq_image_repo: andyshinn/dnsmasq
+dnsmasq_image_tag: &#39;2.72&#39;
+</pre></div>
+</div>
+<p>可以在下载的 ansible roles 默认值中找到可用变量的完整列表。这些也允许为二进制文件和镜像图像指定自定义URL和本地存储库。另请参阅相关 Intranet 配置的 DNS 堆栈文档，以便主机可以解析这些 URL 和 repos。</p>
+</div>
+</div>
+<div class="section" id="ansible">
+<h3>Ansible 变量<a class="headerlink" href="#ansible" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id20">
+<h4>Inventory<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
+<p>inventory 由 3 组内容组成</p>
+<ul class="simple">
+<li>kube-master : 将运行 kubernetes 主组件（apiserver，scheduler，controller）的服务器列表。</li>
+<li>kube-node : 将运行 pod 的 kubernetes 节点列表。</li>
+<li>etcd : 组成 etcd 服务器的服务器列表。您应该至少有3台服务器用于故障转移。</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">不要修改 k8s-cluster 的子类，比如将 etcd 组放入 k8s-cluster 组中，除非你确定要这样做并且你完全包含在后者中：</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>k8s-cluster ⊂ etcd =&gt; kube-node ∩ etcd = etcd
+</pre></div>
+</div>
+<p>当 kube-node 包含 etcd 时，您可以将您的 etcd 集群定义为可以为 Kubernetes 工作负载调度。 如果您想要它是独立的，请确保这些组不相交。 如果您希望服务器同时充当主服务器和节点，则必须在kube-master和kube-node两个组上定义服务器。 如果需要独立且不可调度的主服务器，则必须仅在 kube-master 而不是 kube-node 中定义服务器。</p>
+<p>还有两个特殊的群组：</p>
+<ul class="simple">
+<li>calico-rr : 查看 <a class="reference external" href="https://github.com/kubernetes-incubator/kubespray/blob/master/docs/calico.md">先进的 Calico 网络案例</a> 。</li>
+<li>bastion : 如果您的节点不可直接访问，请配置堡垒主机。</li>
+</ul>
+<p>以下是完整的 inventory 示例:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">## Configure &#39;ip&#39; variable to bind kubernetes services on a</span>
+<span class="c1">## different ip than the default iface</span>
+<span class="na">node1 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.12 ip=10.3.0.1</span>
+<span class="na">node2 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.13 ip=10.3.0.2</span>
+<span class="na">node3 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.14 ip=10.3.0.3</span>
+<span class="na">node4 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.15 ip=10.3.0.4</span>
+<span class="na">node5 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.16 ip=10.3.0.5</span>
+<span class="na">node6 ansible_ssh_host</span><span class="o">=</span><span class="s">95.54.0.17 ip=10.3.0.6</span>
+
+<span class="k">[kube-master]</span>
+<span class="na">node1</span>
+<span class="na">node2</span>
+
+<span class="k">[etcd]</span>
+<span class="na">node1</span>
+<span class="na">node2</span>
+<span class="na">node3</span>
+
+<span class="k">[kube-node]</span>
+<span class="na">node2</span>
+<span class="na">node3</span>
+<span class="na">node4</span>
+<span class="na">node5</span>
+<span class="na">node6</span>
+
+<span class="k">[k8s-cluster:children]</span>
+<span class="na">kube-node</span>
+<span class="na">kube-master</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id21">
+<h4>组变量和覆盖优先级变量<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<p>用于控制主要部署选项的组变量位于目录 <code class="docutils literal notranslate"><span class="pre">inventory/sample/group_vars</span></code> 中。 可选变量位于 <code class="docutils literal notranslate"><span class="pre">inventory/sample/group_vars/all.yml</span></code> 中。 可以在 <code class="docutils literal notranslate"><span class="pre">inventory/sample/group_vars/k8s-cluster.yml</span></code> 中找到至少一个角色（或节点组）通用的强制变量。 还有 <cite>docker</cite>，<cite>rkt</cite>，<cite>kubernetes preinstall</cite> 和 <cite>master</cite> 角色的角色变量。 根据 ansible 文档，那些不能从组变量中覆盖。 为了覆盖，应该使用 <code class="docutils literal notranslate"><span class="pre">-e</span></code> 运行时标志（最简单的方法）或文档中描述的其他层。</p>
+<p>Kubespray只使用几个层来覆盖事物（或者期望它们被替换为角色）：</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Layer</th>
+<th class="head">Comment</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>role defaults</td>
+<td>provides best UX to override things for Kubespray deployments</td>
+</tr>
+<tr class="row-odd"><td>inventory vars</td>
+<td>Unused</td>
+</tr>
+<tr class="row-even"><td>inventory group_vars</td>
+<td>Expects users to use all.yml,k8s-cluster.yml etc. to override things</td>
+</tr>
+<tr class="row-odd"><td>inventory host_vars</td>
+<td rowspan="3">Unused</td>
+</tr>
+<tr class="row-even"><td>playbook group_vars</td>
+</tr>
+<tr class="row-odd"><td>playbook host_vars</td>
+</tr>
+<tr class="row-even"><td>host facts</td>
+<td>Kubespray overrides for internal roles’ logic, like state flags</td>
+</tr>
+<tr class="row-odd"><td>play vars</td>
+<td rowspan="4">Unused</td>
+</tr>
+<tr class="row-even"><td>play vars_prompt</td>
+</tr>
+<tr class="row-odd"><td>play vars_files</td>
+</tr>
+<tr class="row-even"><td>registered vars</td>
+</tr>
+<tr class="row-odd"><td>set_facts</td>
+<td>Kubespray overrides those, for some places</td>
+</tr>
+<tr class="row-even"><td>role and include vars</td>
+<td>Provides bad UX to override things! Use extra vars to enforce</td>
+</tr>
+<tr class="row-odd"><td>block vars (only for tasks in block)</td>
+<td>Kubespray overrides for internal roles’ logic</td>
+</tr>
+<tr class="row-even"><td>task vars (only for the task)</td>
+<td>Unused for roles, but only for helper scripts</td>
+</tr>
+<tr class="row-odd"><td>extra vars (always win precedence)</td>
+<td>override with ansible-playbook -e &#64;foo.yml</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id22">
+<h4>Ansible 标签<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
+<p>playbooks 定义了以下的标记：</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Tag name</td>
+<td>User for</td>
+</tr>
+<tr class="row-even"><td>apps</td>
+<td>K8s apps 定义</td>
+</tr>
+<tr class="row-odd"><td>azure</td>
+<td>Cloud-provider Azure</td>
+</tr>
+<tr class="row-even"><td>bastion</td>
+<td>Setup ssh config for bastion</td>
+</tr>
+<tr class="row-odd"><td>bootstrap-os</td>
+<td>Anything related to host OS configuration</td>
+</tr>
+<tr class="row-even"><td>network</td>
+<td>Configuring networking plugins for K8s</td>
+</tr>
+<tr class="row-odd"><td>calico</td>
+<td>Network plugin Calico</td>
+</tr>
+<tr class="row-even"><td>canal</td>
+<td>Network plugin Canal</td>
+</tr>
+<tr class="row-odd"><td>flannel</td>
+<td>Network plugin flannel</td>
+</tr>
+<tr class="row-even"><td>weave</td>
+<td>Network plugin Weave</td>
+</tr>
+<tr class="row-odd"><td>cloud-provider</td>
+<td>Cloud-provider related tasks</td>
+</tr>
+<tr class="row-even"><td>dnsmasq</td>
+<td>Configuring DNS stack for hosts and K8s apps</td>
+</tr>
+<tr class="row-odd"><td>docker</td>
+<td>Configuring docker for hosts</td>
+</tr>
+<tr class="row-even"><td>download</td>
+<td>Fetching container images to a delegate host</td>
+</tr>
+<tr class="row-odd"><td>etcd</td>
+<td>Configuring etcd cluster</td>
+</tr>
+<tr class="row-even"><td>etcd-pre-upgrade</td>
+<td>Upgrading etcd cluster</td>
+</tr>
+<tr class="row-odd"><td>etcd-secrets</td>
+<td>Configuring etcd certs/keys</td>
+</tr>
+<tr class="row-even"><td>etchosts</td>
+<td>Configuring /etc/hosts entries for hosts</td>
+</tr>
+<tr class="row-odd"><td>facts</td>
+<td>Gathering facts and misc check results</td>
+</tr>
+<tr class="row-even"><td>gce</td>
+<td>Cloud-provider GCP</td>
+</tr>
+<tr class="row-odd"><td>hyperkube</td>
+<td>Manipulations with K8s hyperkube image</td>
+</tr>
+<tr class="row-even"><td>k8s-pre-upgrade</td>
+<td>Upgrading K8s cluster</td>
+</tr>
+<tr class="row-odd"><td>k8s-secrets</td>
+<td>Configuring K8s certs/keys</td>
+</tr>
+<tr class="row-even"><td>kube-apiserver</td>
+<td>Configuring static pod kube-apiserver</td>
+</tr>
+<tr class="row-odd"><td>kube-controller-manager</td>
+<td>Configuring static pod kube-controller-manager</td>
+</tr>
+<tr class="row-even"><td>kubectl</td>
+<td>Installing kubectl and bash completion</td>
+</tr>
+<tr class="row-odd"><td>kubelet</td>
+<td>Configuring kubelet service</td>
+</tr>
+<tr class="row-even"><td>kube-proxy</td>
+<td>Configuring static pod kube-proxy</td>
+</tr>
+<tr class="row-odd"><td>kube-scheduler</td>
+<td>Configuring static pod kube-scheduler</td>
+</tr>
+<tr class="row-even"><td>localhost</td>
+<td>Special steps for the localhost (ansible runner)</td>
+</tr>
+<tr class="row-odd"><td>master</td>
+<td>Configuring K8s master node role</td>
+</tr>
+<tr class="row-even"><td>netchecker</td>
+<td>Installing netchecker K8s app</td>
+</tr>
+<tr class="row-odd"><td>nginx</td>
+<td>Configuring LB for kube-apiserver instances</td>
+</tr>
+<tr class="row-even"><td>node</td>
+<td>Configuring K8s minion (compute) node role</td>
+</tr>
+<tr class="row-odd"><td>openstack</td>
+<td>Cloud-provider OpenStack</td>
+</tr>
+<tr class="row-even"><td>preinstall</td>
+<td>Preliminary configuration steps</td>
+</tr>
+<tr class="row-odd"><td>resolvconf</td>
+<td>Configuring <code class="docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> for hosts/apps</td>
+</tr>
+<tr class="row-even"><td>upgrade</td>
+<td>Upgrading, f.e. container images/binaries</td>
+</tr>
+<tr class="row-odd"><td>upload</td>
+<td>Distributing images/binaries across hosts</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">使用 <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/gen_tags.sh</span></code> 命令生成代码库中找到的所有标记的列表。将使用空的 <cite>Used for</cite> 字段列出新标签。</p>
+</div>
+</div>
+<div class="section" id="id23">
+<h4>命令示例<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h4>
+<p>用于过滤和应用 DNS 配置任务并跳过与主机操作系统配置相关的所有其他内容以及下载容器映像的示例命令：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/sample/hosts.ini cluster.yml --tags preinstall,dnsmasq,facts --skip-tags=download,bootstrap-os
+</pre></div>
+</div>
+<p>此 play 仅从主机的 <code class="docutils literal notranslate"><span class="pre">/etc/resolv.conf</span></code> 文件中删除K8s群集DNS解析器IP：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/sample/hosts.ini -e dnsmasq_dns_server=&#39;&#39; cluster.yml --tags resolvconf
+</pre></div>
+</div>
+<p>这样就可以在本地（在 ansible runner 节点）准备所有容器镜像，而无需安装或升级相关内容或尝试将容器上传到K8s集群节点：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ansible-playbook -i inventory/sample/hosts.ini cluster.yml \
+  -e download_run_once=true -e download_localhost=true \
+  --tags download --skip-tags upload,upgrade
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">只有当你100％确定自己在做什么时才使用 <code class="docutils literal notranslate"><span class="pre">--tags</span></code> 和 <code class="docutils literal notranslate"><span class="pre">--skip-tags</span></code> 。</p>
+</div>
+</div>
+<div class="section" id="id24">
+<h4>堡垒主机<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+<p>如果您不想公开访问节点（仅具有专用IP的节点），则可以使用所谓的堡垒主机连接到您的节点。 要指定和使用堡垒，只需在 inventory 中添加一行，您必须使用堡垒主机的公共IP替换 <code class="docutils literal notranslate"><span class="pre">x.x.x.x</span></code> 。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>bastion ansible_ssh_host=x.x.x.x
+</pre></div>
+</div>
+<p>有关Ansible和堡垒主机的更多信息，请阅读 <a class="reference external" href="http://blog.scottlowe.org/2015/12/24/running-ansible-through-ssh-bastion-host/">通过 ssh 堡垒主机运行 Ansible</a> 。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../index.html" class="btn btn-neutral" title="欢迎来到 kubernetes 手册" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, renkeju.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
