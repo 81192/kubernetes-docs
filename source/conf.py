@@ -99,6 +99,7 @@ html_static_path = ['_static']
 # html_sidebars = {}
 
 html_logo = "_static/kubernetes-logo.png"
+html_favicon = "_static/favicon.png"
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
