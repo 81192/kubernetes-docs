@@ -21,6 +21,7 @@ kube-apiserver 支持同时提供 https（默认监听在 6443 端口）和 http
 
 .. code-block:: bash
 
+   $ kubectl api-versions
    admissionregistration.k8s.io/v1beta1
    apiextensions.k8s.io/v1beta1
    apiregistration.k8s.io/v1beta1

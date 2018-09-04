@@ -500,7 +500,8 @@ rev={4 1}, key=key2, value=&quot;v22&quot;
 </pre></div>
 </div>
 <p>可以通过 <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">api-versions</span></code> 和 <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">api-resources</span></code> 查询 Kubernetes API 支持的 API 版本以及资源对象。</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>admissionregistration.k8s.io/v1beta1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ kubectl api-versions
+admissionregistration.k8s.io/v1beta1
 apiextensions.k8s.io/v1beta1
 apiregistration.k8s.io/v1beta1
 apps.openshift.io/v1
@@ -710,6 +711,81 @@ $ curl <span class="nv">$APISERVER</span>/api --header <span class="s2">&quot;Au
 <li><a class="reference external" href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/">v1.10 API Reference</a></li>
 <li><a class="reference external" href="https://kubernetes.io/docs/api-reference/v1.9/">v1.9 API Reference</a></li>
 <li><a class="reference external" href="https://kubernetes.io/docs/api-reference/v1.8/">v1.8 API Reference</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="kube-scheduler">
+<h2>kube-scheduler<a class="headerlink" href="#kube-scheduler" title="Permalink to this headline">¶</a></h2>
+<p>kube-scheduler 负责分配调度 Pod 到集群内的节点上，它监听 kube-apiserver，查询还未分配 Node 的 Pod，然后根据调度策略为这些 Pod 分配节点（更新 Pod 的 <cite>NodeName</cite> 字段）。</p>
+<p>调度器需要充分考虑诸多的因素：</p>
+<ul class="simple">
+<li>公平调度</li>
+<li>资源高效利用</li>
+<li>Qos</li>
+<li>affinity 和 anti-affinity</li>
+<li>数据本地化（data locality）</li>
+<li>内部负载干扰（inter-workload interference）</li>
+<li>deadlines</li>
+</ul>
+<div class="section" id="node">
+<h3>指定 Node 节点调度<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h3>
+<p>有三种方式指定 Pod 只运行在指定的 Node 节点上</p>
+<ul class="simple">
+<li>nodeSelector：只调度到匹配指定的 label 的 Node 上</li>
+<li>nodeAffinity：功能更丰富的 Node 选择器，比如支持集合操作</li>
+<li>podAffinity：调度到满足条件的 Pod 所在的 Node 上</li>
+</ul>
+</div>
+<div class="section" id="nodeselector">
+<h3>nodeSelector 示例<a class="headerlink" href="#nodeselector" title="Permalink to this headline">¶</a></h3>
+<p>首先给 Node 打上标签</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>kubectl label nodes node-01 disktype=ssd
+</pre></div>
+</div>
+<p>然后再 daemonset 中指定 nodeSelector 为 <code class="docutils literal notranslate"><span class="pre">disktype=ssd</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>spec:
+  nodeSelector:
+    disktype: ssd
+</pre></div>
+</div>
+</div>
+<div class="section" id="nodeaffinity">
+<h3>nodeAffinity 示例<a class="headerlink" href="#nodeaffinity" title="Permalink to this headline">¶</a></h3>
+<p>nodeAffinity 目前支持两种：<cite>requiredDuringSchedulingIgnoredDuringExecution</cite> 和 <cite>preferredDuringSchedulingIgnoredDuringExecution</cite>，分别代表必须满足条件和优选条件。比如下面的例子代表调度到包含标签 <code class="docutils literal notranslate"><span class="pre">kubernetes.io/e2e-az-name</span></code> 并且值为 e2e-az1 或者 e2e-az2 的 Node 上，并且优选还带有标签 <code class="docutils literal notranslate"><span class="pre">another-node-label-key=another-node-label-value</span></code> 的 Node。</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">apiVersion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="l l-Scalar l-Scalar-Plain">kind</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Pod</span>
+<span class="l l-Scalar l-Scalar-Plain">metadata</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">with-node-affinity</span>
+<span class="l l-Scalar l-Scalar-Plain">spec</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">affinity</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">nodeAffinity</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">nodeSelectorTerms</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matchExpressions</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">kubernetes.io/e2e-az-name</span>
+            <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">In</span>
+            <span class="l l-Scalar l-Scalar-Plain">values</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e2e-az1</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">e2e-az2</span>
+      <span class="l l-Scalar l-Scalar-Plain">preferredDuringSchedulingIgnoredDuringExecution</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">weight</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+        <span class="l l-Scalar l-Scalar-Plain">preference</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">matchExpressions</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">another-node-label-key</span>
+            <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">In</span>
+            <span class="l l-Scalar l-Scalar-Plain">values</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">another-node-label-value</span>
+  <span class="l l-Scalar l-Scalar-Plain">containers</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">with-node-affinity</span>
+    <span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">gcr.io/google_containers/pause:2.0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="podaffinity">
+<h3>podAffinity 示例<a class="headerlink" href="#podaffinity" title="Permalink to this headline">¶</a></h3>
+<p>podAffinity 基于 Pod 的标签来选择 Node，仅调度到满足条件 Pod 所在的 Node 上，支持 podAffinity 和 PodAntiAffinity。这个功能比较绕，以下面的例子为例：</p>
+<ul class="simple">
+<li>如果一个 “Node 所在 Zone 中包含至少一个带有 <code class="docutils literal notranslate"><span class="pre">security=S1</span></code> 标签且运行中的 Pod”</li>
 </ul>
 </div>
 </div>
