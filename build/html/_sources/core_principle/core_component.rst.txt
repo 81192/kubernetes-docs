@@ -85,3 +85,4 @@ Worker node(s)
 +----------+-----------+-------------+-----------------------+
 
 .. include:: /core_principle/core_component/etcd.rst
+.. include:: /core_principle/core_component/api_server.rst
