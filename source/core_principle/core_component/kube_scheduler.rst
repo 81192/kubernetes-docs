@@ -123,3 +123,166 @@ Taints 和 tolerations 用于保证 Pod 不被调度到不合适的 Node 上，�
 * NoSchedule：新的 Pod 不调度到该 Node 上，不影响正在运行的 Pod
 * PreferNoSchedule：soft 版的 NodeSchedule，尽量不调度到该 Node 上
 * NoExecute：新的 Pod 不调度到该 Node 上，并且删除（evict）已在运行的 Pod。Pod 可以增加一个时间（tolerationSeconds）
+
+然而，当 Pod 的 Tolerations 匹配 Node 的所有 Taints 的时候可以调度到该 Node 上；当 Pod 是已经运行的时候，也不会被删除（evicted）。另外对于 NoExecute，如果 Pod 增加了一个 tolerationSeconds，则会在该时间之后才删除 Pod。
+
+比如，假设 node1 上应用以下几个 taint
+
+.. code-block:: none
+
+   kubectl taint nodes node1 key1=value1:NoSchedule
+   kubectl taint nodes node1 key1=value1:NoExecute
+   kubectl taint nodes node1 key2=value2:NoSchedule
+
+下面的这个 Pod 由于没有 tolerate ``key2=value2:NoSchedule`` 无法调度到 node1 上
+
+.. code-block:: none
+
+   tolerations:
+   - key: "key1"
+     operator: "Equal"
+     value: "value1"
+     effect: "NoSchedule"
+   - key: "key1"
+     operator: "Equal"
+     value: "value1"
+     effect: "NoExecute"
+
+而正在运行且带有 tolerationSeconds 的 Pod 则会在 600s 之后删除
+
+.. code-block:: none
+
+   tolerations:
+   - key: "key1"
+     operator: "Equal"
+     value: "value1"
+     effect: "NoSchedule"
+   - key: "key1"
+     operator: "Equal"
+     value: "value1"
+     effect: "NoExcute"
+     tolerationSeconds: 600
+   - key: "key2"
+     operator: "Equal"
+     value: "value2"
+     effect: "NoSchedule"
+
+注意，DeamonSet 创建的 Pod 会自动加上对 ``node.alpha.kubernetes.io/unreachable`` 和 ``node.alpha.kubernetes.io/notReady`` 和 NoExecute Roleration，以避免他们因此被删除。
+
+优先调度级
+^^^^^^^^^^^^^^
+
+从 v1.8 开始，kube-scheduler 支持定义 Pod 的优先级，从而保证高优先级的 Pod 优先调度。从 v1.11 开始默认开启。
+
+.. note:: 
+
+   在 v1.8 - v1.10 版本中开启方法为
+
+   * apiserver 配置 ``--featrue-gates=PodPriority=true`` 和 ``--runtime-config=scheduling.k8s.io/v1alpha1=true``
+   * kube-scheduler 配置 ``--feature-gates=PodPriority=true``
+
+在指定 Pod 的优先级之前需要先定义一个 PriorityClass（非 namespace 资源），如
+
+.. code-block:: yaml
+
+   apiVersion: v1
+   kind： PriorityClass
+   metadata:
+    name: high-priority
+   value: 1000000
+   globalDefault: false
+   description: "This priority class should be used for XYZ service pods only."
+
+其中
+
+* ``value`` 为 32 位整数的优先级，该值越大，优先级越高
+* ``globalDefault`` 用于未配置 PriorityClassName 的 Pod，整个集群中应该只有一个 PriorityClass 将其设置为 true
+
+然后，在 PodSpec 中通过 PriorityClassName 设置 Pod 的优先级：
+
+.. code-block:: yaml
+
+   apiVersion：v1
+   kind: Pod
+   metadata:
+     name: nginx
+     labels:
+       env: test
+   spec:
+     containers:
+     - name: nginx
+       image: nginx
+       imagePullPolicy: IfNotPresent
+     priorityClassName: high-priority
+
+多调度器
+^^^^^^^^^^^^^
+
+如果默认的调度器不满足要求，还可以部署自定义的调度器。并且，在整个集群中可以同时运行多个调度器实例，通过 ``podSpec.schedulerName`` 来选择使用哪一个调度器（默认使用内置的调度器）。
+
+.. code-block:: yaml
+
+   apizVersion: v1
+   kind: Pod
+   metadata:
+     name: nginx
+     labels:
+       app: nginx
+   spec:
+     # 选择使用自定义调度器 my-scheduler
+     schedulerName: my-scheduler
+     containers:
+     - name: nginx
+       image: nginx:1.10
+
+调度器的实例参见 这里。
+
+调度器扩展
+^^^^^^^^^^^^
+
+kube-scheduler 还支持使用 ``--policy-config-file`` 指定一个调度策略文件来自定义调度策略，比如：
+
+.. code-block:: json
+
+   {
+   "kind" : "Policy",
+   "apiVersion" : "v1",
+   "predicates" : [
+       {"name" : "PodFitsHostPorts"},
+       {"name" : "PodFitsResources"},
+       {"name" : "NoDiskConflict"},
+       {"name" : "MatchNodeSelector"},
+       {"name" : "HostName"}
+       ],
+   "priorities" : [
+       {"name" : "LeastRequestedPriority", "weight" : 1},
+       {"name" : "BalancedResourceAllocation", "weight" : 1},
+       {"name" : "ServiceSpreadingPriority", "weight" : 1},
+       {"name" : "EqualPriority", "weight" : 1}
+       ],
+   "extenders":[
+       {
+           "urlPrefix": "http://127.0.0.1:12346/scheduler",
+           "apiVersion": "v1beta1",
+           "filterVerb": "filter",
+           "prioritizeVerb": "prioritize",
+           "weight": 5,
+           "enableHttps": false,
+           "nodeCacheCapable": false
+       }
+       ]
+   }
+
+其他影响调度的因素
+^^^^^^^^^^^^^^^^^^^^
+
+* 如果 Node Condition 处于 MemoryPressure，则所有 BastEffort 的新 Pod（未指定 resources limits 和 requests）不会调度到改 Node 上。
+* 如果 Node Condition 处于 DiskPressure，则所有新 Pod 都不会调度到该 Node 上。
+* 为了保证 Critical Pods 正常运行，当它们处于异常状态时会自动重新调度。
+
+  Critical Pods 是指
+  
+  * annotation 包括 ``scheduler.alpha.kubernetes.io/critical-pod=''``
+  * tolerations 包括 ``[{"key":"CriticalAddonsOnly", "operator":"Exists"}]``
+  * priorityClass 为 ``system-cluster-critical`` 或者 ``system-node-critical``
+
