@@ -785,8 +785,303 @@ $ curl <span class="nv">$APISERVER</span>/api --header <span class="s2">&quot;Au
 <h3>podAffinity 示例<a class="headerlink" href="#podaffinity" title="Permalink to this headline">¶</a></h3>
 <p>podAffinity 基于 Pod 的标签来选择 Node，仅调度到满足条件 Pod 所在的 Node 上，支持 podAffinity 和 PodAntiAffinity。这个功能比较绕，以下面的例子为例：</p>
 <ul class="simple">
-<li>如果一个 “Node 所在 Zone 中包含至少一个带有 <code class="docutils literal notranslate"><span class="pre">security=S1</span></code> 标签且运行中的 Pod”</li>
+<li>如果一个 “Node 所在 Zone 中包含至少一个带有 <code class="docutils literal notranslate"><span class="pre">security=S1</span></code> 标签且运行中的 Pod”，那么可以调度到该 Node</li>
+<li>不调度到“包含至少一个带有 <code class="docutils literal notranslate"><span class="pre">security=S2</span></code> 标签且运行中 Pod” 的 Node 上。</li>
 </ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">apiVersion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="l l-Scalar l-Scalar-Plain">kind</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Pod</span>
+<span class="l l-Scalar l-Scalar-Plain">metadata</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">with-pod-affinity</span>
+<span class="l l-Scalar l-Scalar-Plain">spec</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">affinity</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">podAffinity</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">labelSelector</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">matchExpressions</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">security</span>
+            <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">In</span>
+            <span class="l l-Scalar l-Scalar-Plain">values</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">S1</span>
+        <span class="l l-Scalar l-Scalar-Plain">topologyKey</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">failure-domain.beta.kubernetes.io/zone</span>
+    <span class="l l-Scalar l-Scalar-Plain">podAntiAffinity</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">preferredDuringSchedulingIgnoredDuringExecution</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">weight</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">100</span>
+        <span class="l l-Scalar l-Scalar-Plain">podAffinityTerm</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">labelSelector</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">matchExpressions</span><span class="p p-Indicator">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">security</span>
+              <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">In</span>
+              <span class="l l-Scalar l-Scalar-Plain">values</span><span class="p p-Indicator">:</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">S2</span>
+          <span class="l l-Scalar l-Scalar-Plain">topologyKey</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">kubernetes.io/hostname</span>
+  <span class="l l-Scalar l-Scalar-Plain">containers</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">with-pod-affinity</span>
+    <span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">gcr.io/google_containers/pause:2.0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="taints-tolerations">
+<h3>Taints 和 tolerations<a class="headerlink" href="#taints-tolerations" title="Permalink to this headline">¶</a></h3>
+<p>Taints 和 tolerations 用于保证 Pod 不被调度到不合适的 Node 上，其中 Taint 应用于 Node 上，而 toleration 则应用于 Pod 上。</p>
+<p>目前支持的 taint 类型</p>
+<ul class="simple">
+<li>NoSchedule：新的 Pod 不调度到该 Node 上，不影响正在运行的 Pod</li>
+<li>PreferNoSchedule：soft 版的 NodeSchedule，尽量不调度到该 Node 上</li>
+<li>NoExecute：新的 Pod 不调度到该 Node 上，并且删除（evict）已在运行的 Pod。Pod 可以增加一个时间（tolerationSeconds）</li>
+</ul>
+<p>然而，当 Pod 的 Tolerations 匹配 Node 的所有 Taints 的时候可以调度到该 Node 上；当 Pod 是已经运行的时候，也不会被删除（evicted）。另外对于 NoExecute，如果 Pod 增加了一个 tolerationSeconds，则会在该时间之后才删除 Pod。</p>
+<p>比如，假设 node1 上应用以下几个 taint</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>kubectl taint nodes node1 key1=value1:NoSchedule
+kubectl taint nodes node1 key1=value1:NoExecute
+kubectl taint nodes node1 key2=value2:NoSchedule
+</pre></div>
+</div>
+<p>下面的这个 Pod 由于没有 tolerate <code class="docutils literal notranslate"><span class="pre">key2=value2:NoSchedule</span></code> 无法调度到 node1 上</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tolerations:
+- key: &quot;key1&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value1&quot;
+  effect: &quot;NoSchedule&quot;
+- key: &quot;key1&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value1&quot;
+  effect: &quot;NoExecute&quot;
+</pre></div>
+</div>
+<p>而正在运行且带有 tolerationSeconds 的 Pod 则会在 600s 之后删除</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tolerations:
+- key: &quot;key1&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value1&quot;
+  effect: &quot;NoSchedule&quot;
+- key: &quot;key1&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value1&quot;
+  effect: &quot;NoExcute&quot;
+  tolerationSeconds: 600
+- key: &quot;key2&quot;
+  operator: &quot;Equal&quot;
+  value: &quot;value2&quot;
+  effect: &quot;NoSchedule&quot;
+</pre></div>
+</div>
+<p>注意，DeamonSet 创建的 Pod 会自动加上对 <code class="docutils literal notranslate"><span class="pre">node.alpha.kubernetes.io/unreachable</span></code> 和 <code class="docutils literal notranslate"><span class="pre">node.alpha.kubernetes.io/notReady</span></code> 和 NoExecute Roleration，以避免他们因此被删除。</p>
+</div>
+<div class="section" id="id19">
+<h3>优先调度级<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>从 v1.8 开始，kube-scheduler 支持定义 Pod 的优先级，从而保证高优先级的 Pod 优先调度。从 v1.11 开始默认开启。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>在 v1.8 - v1.10 版本中开启方法为</p>
+<ul class="last simple">
+<li>apiserver 配置 <code class="docutils literal notranslate"><span class="pre">--featrue-gates=PodPriority=true</span></code> 和 <code class="docutils literal notranslate"><span class="pre">--runtime-config=scheduling.k8s.io/v1alpha1=true</span></code></li>
+<li>kube-scheduler 配置 <code class="docutils literal notranslate"><span class="pre">--feature-gates=PodPriority=true</span></code></li>
+</ul>
+</div>
+<p>在指定 Pod 的优先级之前需要先定义一个 PriorityClass（非 namespace 资源），如</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">apiVersion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="l l-Scalar l-Scalar-Plain">kind： PriorityClass</span>
+<span class="l l-Scalar l-Scalar-Plain">metadata</span><span class="p p-Indicator">:</span>
+ <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">high-priority</span>
+<span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1000000</span>
+<span class="l l-Scalar l-Scalar-Plain">globalDefault</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="s">&quot;This</span><span class="nv"> </span><span class="s">priority</span><span class="nv"> </span><span class="s">class</span><span class="nv"> </span><span class="s">should</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">XYZ</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">pods</span><span class="nv"> </span><span class="s">only.&quot;</span>
+</pre></div>
+</div>
+<p>其中</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code> 为 32 位整数的优先级，该值越大，优先级越高</li>
+<li><code class="docutils literal notranslate"><span class="pre">globalDefault</span></code> 用于未配置 PriorityClassName 的 Pod，整个集群中应该只有一个 PriorityClass 将其设置为 true</li>
+</ul>
+<p>然后，在 PodSpec 中通过 PriorityClassName 设置 Pod 的优先级：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">apiVersion：v1</span>
+<span class="l l-Scalar l-Scalar-Plain">kind</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Pod</span>
+<span class="l l-Scalar l-Scalar-Plain">metadata</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+  <span class="l l-Scalar l-Scalar-Plain">labels</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="l l-Scalar l-Scalar-Plain">spec</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">containers</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+    <span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+    <span class="l l-Scalar l-Scalar-Plain">imagePullPolicy</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">IfNotPresent</span>
+  <span class="l l-Scalar l-Scalar-Plain">priorityClassName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">high-priority</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id20">
+<h3>多调度器<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<p>如果默认的调度器不满足要求，还可以部署自定义的调度器。并且，在整个集群中可以同时运行多个调度器实例，通过 <code class="docutils literal notranslate"><span class="pre">podSpec.schedulerName</span></code> 来选择使用哪一个调度器（默认使用内置的调度器）。</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">apizVersion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="l l-Scalar l-Scalar-Plain">kind</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Pod</span>
+<span class="l l-Scalar l-Scalar-Plain">metadata</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+  <span class="l l-Scalar l-Scalar-Plain">labels</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">app</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="l l-Scalar l-Scalar-Plain">spec</span><span class="p p-Indicator">:</span>
+  <span class="c1"># 选择使用自定义调度器 my-scheduler</span>
+  <span class="l l-Scalar l-Scalar-Plain">schedulerName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">my-scheduler</span>
+  <span class="l l-Scalar l-Scalar-Plain">containers</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx</span>
+    <span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx:1.10</span>
+</pre></div>
+</div>
+<p>调度器的实例参见 这里。</p>
+</div>
+<div class="section" id="id21">
+<h3>调度器扩展<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<p>kube-scheduler 还支持使用 <code class="docutils literal notranslate"><span class="pre">--policy-config-file</span></code> 指定一个调度策略文件来自定义调度策略，比如：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;kind&quot;</span> <span class="p">:</span> <span class="s2">&quot;Policy&quot;</span><span class="p">,</span>
+<span class="nt">&quot;apiVersion&quot;</span> <span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span>
+<span class="nt">&quot;predicates&quot;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;PodFitsHostPorts&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;PodFitsResources&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;NoDiskConflict&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;MatchNodeSelector&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;HostName&quot;</span><span class="p">}</span>
+    <span class="p">],</span>
+<span class="nt">&quot;priorities&quot;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LeastRequestedPriority&quot;</span><span class="p">,</span> <span class="nt">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;BalancedResourceAllocation&quot;</span><span class="p">,</span> <span class="nt">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ServiceSpreadingPriority&quot;</span><span class="p">,</span> <span class="nt">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;EqualPriority&quot;</span><span class="p">,</span> <span class="nt">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="p">],</span>
+<span class="nt">&quot;extenders&quot;</span><span class="p">:[</span>
+    <span class="p">{</span>
+        <span class="nt">&quot;urlPrefix&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:12346/scheduler&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;v1beta1&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;filterVerb&quot;</span><span class="p">:</span> <span class="s2">&quot;filter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;prioritizeVerb&quot;</span><span class="p">:</span> <span class="s2">&quot;prioritize&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="nt">&quot;enableHttps&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;nodeCacheCapable&quot;</span><span class="p">:</span> <span class="kc">false</span>
+    <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id22">
+<h3>其他影响调度的因素<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">如果 Node Condition 处于 MemoryPressure，则所有 BastEffort 的新 Pod（未指定 resources limits 和 requests）不会调度到改 Node 上。</p>
+</li>
+<li><p class="first">如果 Node Condition 处于 DiskPressure，则所有新 Pod 都不会调度到该 Node 上。</p>
+</li>
+<li><p class="first">为了保证 Critical Pods 正常运行，当它们处于异常状态时会自动重新调度。</p>
+<p>Critical Pods 是指</p>
+<ul class="simple">
+<li>annotation 包括 <code class="docutils literal notranslate"><span class="pre">scheduler.alpha.kubernetes.io/critical-pod=''</span></code></li>
+<li>tolerations 包括 <code class="docutils literal notranslate"><span class="pre">[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,</span> <span class="pre">&quot;operator&quot;:&quot;Exists&quot;}]</span></code></li>
+<li>priorityClass 为 <code class="docutils literal notranslate"><span class="pre">system-cluster-critical</span></code> 或者 <code class="docutils literal notranslate"><span class="pre">system-node-critical</span></code></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="id23">
+<h3>启动 kube-scheduler 示例<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kube-scheduler <span class="se">\</span>
+  --address<span class="o">=</span><span class="m">127</span>.0.0.1 <span class="se">\</span>
+  --leader-elect<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+  --kubeconfig<span class="o">=</span>/etc/kubernetes/scheduler.conf
+</pre></div>
+</div>
+</div>
+<div class="section" id="id24">
+<h3>kube-scheduler 工作原理<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id25">
+<h4>kube-scheduler 调度原理<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>For given pod:
+
+    +---------------------------------------------+
+    |               Schedulable nodes:            |
+    |                                             |
+    | +--------+    +--------+      +--------+    |
+    | | node 1 |    | node 2 |      | node 3 |    |
+    | +--------+    +--------+      +--------+    |
+    |                                             |
+    +-------------------+-------------------------+
+                        |
+                        |
+                        v
+    +-------------------+-------------------------+
+
+    Pred. filters: node 3 doesn&#39;t have enough resource
+
+    +-------------------+-------------------------+
+                        |
+                        |
+                        v
+    +-------------------+-------------------------+
+    |             remaining nodes:                |
+    |   +--------+                 +--------+     |
+    |   | node 1 |                 | node 2 |     |
+    |   +--------+                 +--------+     |
+    |                                             |
+    +-------------------+-------------------------+
+                        |
+                        |
+                        v
+    +-------------------+-------------------------+
+
+    Priority function:    node 1: p=2
+                          node 2: p=5
+
+    +-------------------+-------------------------+
+                        |
+                        |
+                        v
+            select max{node priority} = node 2
+</pre></div>
+</div>
+<p>kube-scheduler 调度分为两个阶段，predicate 和 priority</p>
+<ul class="simple">
+<li>predicate：过滤不符合条件的节点</li>
+<li>priority：优先级排序，选择优先级最高的节点</li>
+</ul>
+</div>
+<div class="section" id="predicates">
+<h4>predicates 策略<a class="headerlink" href="#predicates" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>PodFitsPorts: 同 PodFitsHostPorts</li>
+<li>PodFitsHostPorts: 检查是否有 Host Ports 冲突</li>
+<li>PodFitsResources: 检查 Node 的资源是否充足，包括允许的 Pod 数量、CPU、内存、GPU 个数以及其他的 OpaqueIntResource</li>
+<li>HostName: 检查 <code class="docutils literal notranslate"><span class="pre">pod.Spec.NodeName</span></code> 是否与候选节点一致</li>
+<li>MatchNodeSelector: 检查候选节点的 <code class="docutils literal notranslate"><span class="pre">pod.Spec.NodeSelector</span></code> 是否匹配</li>
+<li>NoVolumZoneConflict: 检查 volume zone 是否冲突</li>
+<li>MaxEBSVolumCount: 检查 AWS EBS Volume 数量是否过多（默认不超过 39）</li>
+<li>MaxGCEPDVolumeCount: 检查 GCE PD Volume 数量是否过多（默认不超过 16）</li>
+<li>MaxAzureDiskVolumeCount： 检查 Azure Disk Volume 数量是否过多（默认不超过 16）</li>
+<li>MatchInterPodAffinity: 检查是否匹配 Pod 的亲和性要求</li>
+<li>NoDiskConflict: 检查是否存在 Volume 冲突，仅限于 GCE PD、AWS EBS、Ceph RBD 以及 ISCSI</li>
+<li>GeneralPredicates: 分为 noncriticalPredicates 和 EssentialPredicates。noncriticalPredicates 中包含 PodFitsResources，EssentialPredicates 中包含 PodFitsHost，PodFitsHostPorts 和 PodselectorMatches。</li>
+<li>PodToleratesNodeTaints: 检查 Pod 是否容忍 Node Taints。</li>
+<li>CheckNodeMemoryPressure: 检查 Pod 是否可以调度到 MemoryPressure 的节点上</li>
+<li>CheckNodeDiskPressure: 检查 Pod 是否可以调度到 DiskPressure 的节点上</li>
+<li>NoVolumNodeConflict: 检查节点是否满足 Pod 所引用的 Volume 的条件</li>
+</ul>
+</div>
+<div class="section" id="priorties">
+<h4>priorties 策略<a class="headerlink" href="#priorties" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>SelecttorSpreadPriority: 优先减少节点上属于同一个 Service 或 Replication Controller 的 Pod 数量</li>
+<li>InterPodAffinityPriority: 优先将 Pod 调度到相同的拓扑上（如同一个节点、Rack、Zone 等）</li>
+<li>LeastRequestedPriority: 优先调度到请求资源少的节点上</li>
+<li>BalancedResourceAllocation: 优先平衡各节点的资源使用</li>
+<li>NodePrefereAvoidPodsPriority: alpha.kubernetes.io/preferAvoidPods 字段判断，权重为 10000，避免其他优先级策略的影响</li>
+<li>NodeAffinityPriority: 优先调度到匹配 NodeAdffinity 的节点上</li>
+<li>TaintTolerationPriority: 优先调度到匹配 TaintToleration 的节点上</li>
+<li>ServiceSpreadingPriority: 尽量将同一个 service 的 Pod 分布到不同节点上，已经被 SelectorSpreadPriority 替代【默认未使用】</li>
+<li>EqualPriority: 将所有节点的优先级设置为 1 【默认未使用】</li>
+<li>ImageLocalityPriotity: 尽量将使用大镜像的容器调度到已经下拉了该镜像的节点上【默认未使用】</li>
+<li>MostRequestedPriority: 尽量调度到已经使用过的 Node 上，特别适用于 cluster-autoscaler【默认未使用】</li>
+</ul>
+<div class="line-block">
+<div class="line">代码入口路径</div>
+<div class="line">与 Kubernetes 其他组件的入口不同（其他都是位于 <code class="docutils literal notranslate"><span class="pre">cmd/</span></code> 目录），kube-schedular 的入口在 <code class="docutils literal notranslate"><span class="pre">plugin/cmd/kube-scheduler</span></code> 。</div>
+</div>
+</div>
 </div>
 </div>
 </div>
