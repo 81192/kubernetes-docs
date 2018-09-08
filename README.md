@@ -1,3 +1,4 @@
 # kubernetes-docs
 
-auther: renkeju
+Auther: renkeju
+Email: renkeju@gmail.com
