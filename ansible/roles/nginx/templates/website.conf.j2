@@ -1,5 +1,5 @@
 server {
-    listen       {{ nginx_http_listen_port }} default_server;
+    listen       {{ nginx_http_listen_port }};
     server_name  {{ nginx_server_name }};
     root         {{ html_file_path }};
 
