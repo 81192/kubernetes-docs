@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="部署手册" href="deployment_guide/deployment_guide.html" />
+    <link rel="next" title="容器" href="container/container.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 
@@ -89,8 +89,8 @@
             
             
               <ul>
+<li class="toctree-l1"><a class="reference internal" href="container/container.html">容器</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment_guide/deployment_guide.html">部署手册</a></li>
-<li class="toctree-l1"><a class="reference internal" href="core_principle/core_priciple.html">核心原理</a></li>
 </ul>
 
             
@@ -159,6 +159,19 @@
 <h1>欢迎来到 kubernetes 手册<a class="headerlink" href="#kubernetes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="container/container.html">容器</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="container/container.html#id2">入门</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="container/container.html#id3">概念</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="container/container.html#docker">Docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="container/container.html#id4">总体架构</a></li>
+<li class="toctree-l3"><a class="reference internal" href="container/container.html#id5">基础用法</a></li>
+<li class="toctree-l3"><a class="reference internal" href="container/container.html#id10">网络模式</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="deployment_guide/deployment_guide.html">部署手册</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="deployment_guide/deployment_guide.html#id2">kubespray</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment_guide/deployment_guide.html#id3">入门</a></li>
@@ -166,52 +179,6 @@
 <li class="toctree-l3"><a class="reference internal" href="deployment_guide/deployment_guide.html#kubespary-kubernetes">在 Kubespary 中升级 Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="deployment_guide/deployment_guide.html#id17">下载二进制文件和容器</a></li>
 <li class="toctree-l3"><a class="reference internal" href="deployment_guide/deployment_guide.html#ansible">Ansible 变量</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="core_principle/core_priciple.html">核心原理</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="core_principle/core_priciple.html#kubernetes">Kubernetes 架构</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#borg">Borg 简介</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id2">Kubernetes 架构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id3">分层架构</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id4">核心组件</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#api">核心 API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id5">生态系统</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="core_principle/core_priciple.html#id7">设计原理</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id8">设计概念</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id9">API 设计原则</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id10">控制机制设计原则</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id11">架构设计原则</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#bootstrapping">引导（Bootstrapping）原则</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id12">核心技术概念和 API 对象</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#pod">Pod</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#replication-controller-rc">复制控制器（Replication Controller，RC）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#replicaset-rs">副本集（ReplicaSet，RS）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#deployment">部署（Deployment）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#service">服务（Service）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#job">任务（Job）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#daemonset">后台支撑服务集（DaemonSet）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#statefulset">有状态服务集（StatefulSet）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#federation">集群联邦（Federation）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#volume">存储卷（Volume）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#persistent-volume-pv-persistent-volume-claim-pvc">持久存储卷（Persistent Volume, PV）和持久存储卷声明（Persistent Volume Claim, PVC）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#node">节点（Node）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#secret">密钥对象（Secret）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#user-account-service-account">用户账户（User Account）和服务账户（Service Account）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#namespace">名称空间（Namespace）</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#rbac">RBAC 访问授权</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id13">总结</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="core_principle/core_priciple.html#id14">核心组件</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id15">组件通信</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#id16">端口号</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#etcd">etcd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#api-server">API Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="core_principle/core_priciple.html#kube-scheduler">kube-scheduler</a></li>
 </ul>
 </li>
 </ul>
@@ -228,7 +195,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="deployment_guide/deployment_guide.html" class="btn btn-neutral float-right" title="部署手册" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="container/container.html" class="btn btn-neutral float-right" title="容器" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -271,6 +238,7 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

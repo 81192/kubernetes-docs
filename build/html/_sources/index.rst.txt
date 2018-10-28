@@ -9,6 +9,6 @@
 .. toctree::
    :maxdepth: 3
 
+   container/container
    deployment_guide/deployment_guide
-   core_principle/core_priciple 
    
