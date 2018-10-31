@@ -7,18 +7,17 @@ ADD 更高级的复制文件
 
 如果 ``<source_path>`` 为一个 tar 压缩文件的话，压缩格式为 ``gzip`` ``bzip2`` 以及 ``xz`` 的情况下，:guilabel:`ADD` 指令将会自动解压缩这个压缩文件到 ``<destination_path>`` 去。
 
-在某些情况下，这个自动解压缩的功能非常游泳，比如官方镜像 `ubuntu <https://github.com/tianon/docker-brew-ubuntu-core/blob/c7e9f7353aa24d1c35f501e06382aed1b540e85f/bionic/Dockerfile>`_ 中：
+在某些情况下，这个自动解压缩的功能非常游泳，比如官方镜像 `ubuntu Dockerfile <https://github.com/tianon/docker-brew-ubuntu-core/blob/c7e9f7353aa24d1c35f501e06382aed1b540e85f/bionic/Dockerfile>`_ 中：
 
 .. code-block:: none
 
     FROM scratch
     ADD ubuntu-bionic-core-cloudimg-amd64-root.tar.gz /
-
     ...
 
 但在某些情况下，如果我们真的希望复制这个压缩文件进去，而不解压缩，这时就不可以使用 :guilabel:`ADD` 命令了。
 
-在 Docker 官方的 `Dockerfile 最佳实践文档 <>`_ 中要求，尽可能的使用 :gulabel:`COPY`，因为 :guilabel:`COPY` 的语义很明确，就是复制文件而已，而 :guilabel:`ADD` 则包含了更复杂的功能，其行为也不一定很清晰。最适合使用 :guilabel:`ADD` 的场合，就是所提及的需要自动解压缩的场合。
+在 Docker 官方的 Dockerfile 最佳实践文档 中要求，尽可能的使用 :guilabel:`COPY`，因为 :guilabel:`COPY` 的语义很明确，就是复制文件而已，而 :guilabel:`ADD` 则包含了更复杂的功能，其行为也不一定很清晰。最适合使用 :guilabel:`ADD` 的场合，就是所提及的需要自动解压缩的场合。
 
 另外需要注意的是，:guilabel:`ADD` 指令会令镜像构建缓存失效，从而可能会令镜像构建变得比较缓慢。
 

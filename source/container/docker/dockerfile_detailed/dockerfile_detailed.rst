@@ -5,3 +5,5 @@ Dockerfile 指令
 
 .. include:: /container/docker/dockerfile_detailed/dockerfile_COPY.rst
 .. include:: /container/docker/dockerfile_detailed/dockerfile_ADD.rst
+.. include:: /container/docker/dockerfile_detailed/dockerfile_CMD.rst
+.. include:: /container/docker/dockerfile_detailed/dockerfile_ENTRYPOINT.rst
