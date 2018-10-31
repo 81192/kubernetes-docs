@@ -7,3 +7,4 @@ Docker
 .. include:: /container/docker/network_use.rst
 .. include:: /container/docker/data_volumes.rst
 .. include:: /container/docker/dockerfile.rst
+.. include:: /container/docker/dockerfile_detailed/dockerfile_detailed.rst
