@@ -5,3 +5,5 @@ Docker
 .. include:: /container/docker/base_use.rst
 .. include:: /container/docker/network_mode.rst
 .. include:: /container/docker/network_use.rst
+.. include:: /container/docker/data_volumes.rst
+.. include:: /container/docker/dockerfile.rst
