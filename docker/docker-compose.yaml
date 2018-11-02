@@ -1,0 +1,20 @@
+version: '3'
+services: 
+
+  html:
+    container_name: sphinx-kubernetes
+    image: sphinx:1.6.4-apline3.8
+    build:
+      context: .
+      dockerfile: Dockerfile.sphinx
+    volumes:
+      - "/Users/renkeju/Documents/kubernetes-docs:/usr/src/sphinx"
+    
+  web:
+    container_name: nginx-kubernetes
+    image: nginx:1.14-alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - "/Users/renkeju/Documents/kubernetes-docs/build/html:/usr/share/nginx/html"
