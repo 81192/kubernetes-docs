@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>下载二进制文件和容器 &mdash; Kubernetes alpha documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Kubernetes
+          
+
+          
+            
+            <img src="../../_static/kubernetes-logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../container/container.html">容器</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment_guide.html">部署手册</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Kubernetes</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>下载二进制文件和容器</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/deployment_guide/kubespray/downloads.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>下载二进制文件和容器<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>支持多种 上传/下载 方式<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>每个节点自己下载二进制文件和容器图像，即 <code class="docutils literal"><span class="pre">download_run_once:</span> <span class="pre">False</span></code> 。</li>
+<li>对于K8s应用程序，拉取策略是如果不存在则拉取 <code class="docutils literal"><span class="pre">k8s_image_pull_policy:</span> <span class="pre">IfNotPresent</span></code> 。</li>
+<li>对于系统管理的容器，如 kubelet 或 etcd，拉取策略是 <code class="docutils literal"><span class="pre">download_always_pull:</span> <span class="pre">False</span></code> ，如果只要有的 repo 和 <cite>tag/sha256 digest</cite> 与主机容器有所不同，就会拉取。</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2>拉取一次 多次推送 模式<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>更改为 <code class="docutils literal"><span class="pre">download_run_once：True</span></code> 仅下载容器映像一次，然后批量推送到群集节点，推送图像的默认委托节点是第一个 kube-master。</li>
+<li>如果您的 <cite>ansible runner</cite> 节点（也称为admin节点）启用了无密码 sudo 和 docker，您可以定义 <code class="docutils literal"><span class="pre">download_localhost：True</span></code> ，这使得该节点成为在使用 ansible 运行部署时推送映像的委托。如果无法通过 ssh 访问到集群中的每个节点，或者您希望将本地 docker 镜像用作多个群集的缓存，则可能就是这种情况。</li>
+</ul>
+<p>容器镜像和二进制文件由诸如 <cite>foo_version</cite>，<cite>foo_download_url</cite>，<cite>foo_checksum`（用于二进制文件）和 `foo_image_repo</cite>，<cite>foo_image_tag</cite> 或容器的可选 <cite>foo_digest_checksum</cite> 等变量描述。</p>
+<p>容器图像可以通过其 repo 和 tag 来定义，例如：<cite>andyshinn/dnsmasq:2.72</cite>。或者通过 repo 和 tag 以及 sha256 digest：<a class="reference external" href="mailto:andyshinn/dnsmasq&#37;&#52;&#48;sha256">andyshinn/dnsmasq<span>&#64;</span>sha256</a>:7c883354f6ea9876d176fe1d30132515478b2859d6fc0cbf9223ffdc09168193。</p>
+<p>请注意，sha256 digest 和镜像标记必须同时指定并相互对应。上面给出的示例由以下变量表示：</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>dnsmasq_digest_checksum: 7c883354f6ea9876d176fe1d30132515478b2859d6fc0cbf9223ffdc09168193
+dnsmasq_image_repo: andyshinn/dnsmasq
+dnsmasq_image_tag: &#39;2.72&#39;
+</pre></div>
+</div>
+<p>可以在下载的 ansible roles 默认值中找到可用变量的完整列表。这些也允许为二进制文件和镜像图像指定自定义URL和本地存储库。另请参阅相关 Intranet 配置的 DNS 堆栈文档，以便主机可以解析这些 URL 和 repos。</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, renkeju
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>基础用法 &mdash; Kubernetes alpha documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Kubernetes
+          
+
+          
+            
+            <img src="../../_static/kubernetes-logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../container.html">容器</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment_guide/deployment_guide.html">部署手册</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Kubernetes</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>基础用法</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/container/docker/base_use.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>基础用法<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>安装<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">依赖的基础环境</p>
+<blockquote>
+<div><ul class="simple">
+<li>64 bits CPU</li>
+<li>Linux Kernel 3.10+</li>
+<li>Linux Kernel cgroups and namespaces</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">CentOS 7+</p>
+<blockquote>
+<div><ul>
+<li><p class="first">“Extras” repository</p>
+<blockquote>
+<div><p>不建议通过 CentOS 默认仓库安装 Docker，版本过旧</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Docker Daemon</p>
+<blockquote>
+<div><ul class="simple">
+<li>systemctl start docker.service</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>个人推荐使用 daocloud 安装 docker，安装方式详见 <a class="reference external" href="https://download.daocloud.io/Docker_Mirror/Docker">daocloud 产品中心 docker 安装方式</a></p>
+</div>
+<div class="section" id="docker">
+<h2>docker 程序环境<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>docker 环境配置都可以由 <code class="docutils literal"><span class="pre">/etc/docker/daemon.guess</span></code> 这个文件所控制。docker 安装后默认没有 daemon.guess 这个配置文件，需要手工创建。</p>
+<p>一般情况下，配置文件 daemin.guess 中配置的项目参数，在启动参数中同样适用，有些可能不一样（具体可以查看官方文档），但需要注意的一点，配置文件中如果已经由摸个配置项，则无法在启动参数中增加，会出现冲突的错误。</p>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">如果在 daemon.guess 文件中进行配置，需要 docker 版本高于 1.12.6（在这个版本不生效，1.13.1 以上是生效的）</p>
+</div>
+<ul>
+<li><p class="first">指定网桥网络</p>
+<blockquote>
+<div><p>给 docker0 分配特定的IP地址，并设置子网掩码</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;bip&quot;: &quot;192.168.199.5/24&quot;
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">指定网桥网络范围</p>
+<blockquote>
+<div><p>限制 docker0 分配给容器的IP的范围。必须是 docker0 所在网络范围内的一个子网，或是由 <code class="docutils literal"><span class="pre">--bridge</span></code> 指定的网桥的IP所在网络范围内的一个子网。此后，为容器分配IP时就会从这个范围内选择一个可用的IP地址。</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;fixed-cidr&quot;: &quot;10.20.0.0/16&quot;,
+    &quot;fixed-cide-v6&quot;: &quot;2001:db8::/64&quot;
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">最大传输单元</p>
+<blockquote>
+<div><p>覆盖 docker0 默认的最大传输单元</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;mtu&quot;: 1500
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">指定 DNS</p>
+<blockquote>
+<div><div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;dns&quot;: [&quot;8.8.8.8&quot;, &quot;8.8.4.4&quot;]
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">指定监听模式</p>
+<blockquote>
+<div><div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;hosts&quot;: [&quot;tcp://0.0.0.0:2376&quot;, &quot;unix:///var/run/docker.sock&quot;]
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">镜像加速器</p>
+<blockquote>
+<div><div class="highlight-guess"><div class="highlight"><pre><span></span>// 配置单个
+{
+    &quot;registry-mirrors&quot;: [&quot;https://registry.docker-cn.com&quot;]
+}
+
+// 配置多个
+{
+    &quot;registry-mirrors&quot;: [&quot;https://registry.docker-cn.com&quot;, &quot;https://docker.mirrors.ustc.edu.cn/&quot;]
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">日志</p>
+<blockquote>
+<div><p>log-level 的有效值包括：</p>
+<ul class="simple">
+<li>debug</li>
+<li>info</li>
+<li>warn</li>
+<li>error</li>
+<li>fatal</li>
+</ul>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;debug&quot;: true,
+    &quot;log-level&quot;: &quot;info&quot;
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">监控 Prometheus</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.docker.com/engine/admin/prometheus/#configure-docker">https://docs.docker.com/engine/admin/prometheus/#configure-docker</a></p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;metrics-addr&quot;: &quot;127.0.0.1:9323&quot;,
+    &quot;experimental&quot;: true
+}
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">保持容器在线</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.docker.com/engine/admin/live-restore/#enable-the-live-restore-option">https://docs.docker.com/engine/admin/live-restore/#enable-the-live-restore-option</a></p>
+<p>当 dockerd 进程死掉后，依旧保持容器存活。</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;live-restore&quot;: true
+}
+</pre></div>
+</div>
+<p>Linux 重载 docker daemon</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo <span class="nb">kill</span> -SIGHUP <span class="k">$(</span>pidof dockerd<span class="k">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">设置 镜像、容器、卷 存放目录和驱动</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.docker.com/engine/admin/systemd/#runtime-directory-and-storage-driver">https://docs.docker.com/engine/admin/systemd/#runtime-directory-and-storage-driver</a></p>
+<p>下述两个参数可以单独使用</p>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;graph&quot;: &quot;/mnt/docker-data&quot;,
+    &quot;storage-driver&quot;: &quot;overlay&quot;
+}
+</pre></div>
+</div>
+<p>graph 设置存放目录 —— Docker Root Dir /mnt/docker-data
+storage-driver 设置存储驱动 —— Storage Driver overlay</p>
+</div></blockquote>
+</li>
+<li><p class="first">user namespace remap</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.docker.com/engine/security/userns-remap/#enable-userns-remap-on-the-daemon">https://docs.docker.com/engine/security/userns-remap/#enable-userns-remap-on-the-daemon</a></p>
+<p>安全设置：用户空间重映射</p>
+<p>userns-remap 的值可以是 如果值字段 只有 一个值，那么该字段表示组。如果需要同时指定 用户和组，需要使用 冒号 分割，格式为 用户:组</p>
+<ul>
+<li><p class="first">组</p>
+</li>
+<li><p class="first">用户:组</p>
+</li>
+<li><p class="first">组 或 用户 的值可以是组或用户的 名称 或 ID</p>
+<blockquote>
+<div><ul class="simple">
+<li>testuser</li>
+<li>testuser:testuser</li>
+<li>1001</li>
+<li>1001:1001</li>
+<li>testuser:1001</li>
+<li>1001:testuser</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>{
+    &quot;userns-remap&quot;: &quot;testuser&quot;
+}
+
+// 或同时指定 用户和组，且使用 名称和ID
+{
+    &quot;userns-remap&quot;: &quot;testuser:1001&quot;
+}
+</pre></div>
+</div>
+<div class="highlight-guess"><div class="highlight"><pre><span></span>$ dockerd --userns-remap<span class="o">=</span><span class="s2">&quot;testuser:testuser&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">userns-remap 使用不多，但并不是不重要。目前不是默认启用的原因时因为一些应用会假定 uid 0 的用户拥有特殊能力，从而导致假定失败，然后报错退出。所以如果要启用 user id remap，你要充分测试一下。但是启用 uid remap 的安全性提高是明显的。</p>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>配置完成后我们可以通过命令 <code class="docutils literal"><span class="pre">docker</span> <span class="pre">info</span></code> 查看 docker 详细信息</p>
+</div>
+<div class="section" id="id3">
+<h2>常用操作<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="24%" />
+<col width="6%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">command</th>
+<th class="head">content</th>
+<th class="head">subobject</th>
+<th class="head">subobject content</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="4">config</td>
+<td rowspan="4">Manage Docker configs</td>
+<td>create</td>
+<td>Create a configuration file from a file or STDIN as content</td>
+</tr>
+<tr class="row-odd"><td>inspect</td>
+<td>Display detailed information on one or more configuration files</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List configs</td>
+</tr>
+<tr class="row-odd"><td>rm</td>
+<td>Remove one or more configuration files</td>
+</tr>
+<tr class="row-even"><td rowspan="25">container</td>
+<td rowspan="25">Manage container</td>
+<td>attach</td>
+<td>Attach local standard input, output, and error streams to a running container</td>
+</tr>
+<tr class="row-odd"><td>commit</td>
+<td>Create a new image from a container’s changes</td>
+</tr>
+<tr class="row-even"><td>cp</td>
+<td>Copy files/folders between a container and the local filesystem</td>
+</tr>
+<tr class="row-odd"><td>create</td>
+<td>Create a new container</td>
+</tr>
+<tr class="row-even"><td>diff</td>
+<td>Inspect changes to files or directories on a container’s filesystem</td>
+</tr>
+<tr class="row-odd"><td>exec</td>
+<td>Run a command in a running container</td>
+</tr>
+<tr class="row-even"><td>export</td>
+<td>Export a container’s filesystem as a tar archive</td>
+</tr>
+<tr class="row-odd"><td>inspect</td>
+<td>Display detailed information on one or more containers</td>
+</tr>
+<tr class="row-even"><td>kill</td>
+<td>Kill one or more running containers</td>
+</tr>
+<tr class="row-odd"><td>logs</td>
+<td>Fetch the logs of a container</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List containers</td>
+</tr>
+<tr class="row-odd"><td>pause</td>
+<td>Pause all processes whitin one or more containers</td>
+</tr>
+<tr class="row-even"><td>port</td>
+<td>List port mappings or a specific mapping for the container</td>
+</tr>
+<tr class="row-odd"><td>prune</td>
+<td>Remove all stopped containers</td>
+</tr>
+<tr class="row-even"><td>rename</td>
+<td>Rename a container</td>
+</tr>
+<tr class="row-odd"><td>restart</td>
+<td>Restart one or more containers</td>
+</tr>
+<tr class="row-even"><td>rm</td>
+<td>Remove one or more container</td>
+</tr>
+<tr class="row-odd"><td>run</td>
+<td>Run a command in a new container</td>
+</tr>
+<tr class="row-even"><td>start</td>
+<td>Start one or more stopped containers</td>
+</tr>
+<tr class="row-odd"><td>stars</td>
+<td>Display a live stream of container(s) resource usage statistics</td>
+</tr>
+<tr class="row-even"><td>stop</td>
+<td>Stop one or more running containers</td>
+</tr>
+<tr class="row-odd"><td>top</td>
+<td>Display the running processes of a containers</td>
+</tr>
+<tr class="row-even"><td>unpause</td>
+<td>Unpause all processes within one or more containers</td>
+</tr>
+<tr class="row-odd"><td>update</td>
+<td>Update configuration of one or more containers</td>
+</tr>
+<tr class="row-even"><td>wait</td>
+<td>Block until one or more containers stop, then print their exit codes</td>
+</tr>
+<tr class="row-odd"><td rowspan="12">image</td>
+<td rowspan="12">Manage images</td>
+<td>build</td>
+<td>Build an image from Dockerfile</td>
+</tr>
+<tr class="row-even"><td>history</td>
+<td>Show the history of an image</td>
+</tr>
+<tr class="row-odd"><td>import</td>
+<td>Import the containers from a tarball to create a filesystem image</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on onw or more images</td>
+</tr>
+<tr class="row-odd"><td>load</td>
+<td>Load an image from a tar archive or STDIN</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List images</td>
+</tr>
+<tr class="row-odd"><td>prune</td>
+<td>Remove unused images</td>
+</tr>
+<tr class="row-even"><td>pull</td>
+<td>Pull an image or a repository from a registry</td>
+</tr>
+<tr class="row-odd"><td>push</td>
+<td>Push an image or a repository to a registry</td>
+</tr>
+<tr class="row-even"><td>rm</td>
+<td>Remove one or more images</td>
+</tr>
+<tr class="row-odd"><td>save</td>
+<td>Save one or more images to a tar archive (streamed to STDOUT by default)</td>
+</tr>
+<tr class="row-even"><td>tag</td>
+<td>Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE</td>
+</tr>
+<tr class="row-odd"><td rowspan="7">network</td>
+<td rowspan="7">Manage networks</td>
+<td>connect</td>
+<td>Connect a container to a network</td>
+</tr>
+<tr class="row-even"><td>create</td>
+<td>Create a network</td>
+</tr>
+<tr class="row-odd"><td>disconnect</td>
+<td>Disconnect detailed information on one or more networks</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on one or more networks</td>
+</tr>
+<tr class="row-odd"><td>ls</td>
+<td>List networks</td>
+</tr>
+<tr class="row-even"><td>prune</td>
+<td>Remove all unused networks</td>
+</tr>
+<tr class="row-odd"><td>rm</td>
+<td>Remove one or more networks</td>
+</tr>
+<tr class="row-even"><td rowspan="7">node</td>
+<td rowspan="7">Manage Swarm node</td>
+<td>deamon</td>
+<td>Demote one or more nodes from manager in the swarm</td>
+</tr>
+<tr class="row-odd"><td>inspect</td>
+<td>Display detailed information on one or more nodes</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List nodes in the swarm</td>
+</tr>
+<tr class="row-odd"><td>promote</td>
+<td>Promote one or more nodes to manager in the swarm</td>
+</tr>
+<tr class="row-even"><td>ps</td>
+<td>List tasks running on one or more nodes, defaults to current node</td>
+</tr>
+<tr class="row-odd"><td>rm</td>
+<td>Remove one or more nodes from the swarm</td>
+</tr>
+<tr class="row-even"><td>update</td>
+<td>Update a node</td>
+</tr>
+<tr class="row-odd"><td rowspan="10">plugin</td>
+<td rowspan="10">Manage plugins</td>
+<td>create</td>
+<td>Create a plugin from a rootfs and configuration. Plugin data directory must contain config.json and rootfs directory.</td>
+</tr>
+<tr class="row-even"><td>disable</td>
+<td>Disable a plugin</td>
+</tr>
+<tr class="row-odd"><td>enable</td>
+<td>Enable a plugin</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on one or more plugins</td>
+</tr>
+<tr class="row-odd"><td>install</td>
+<td>Install a plugin</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List plugins</td>
+</tr>
+<tr class="row-odd"><td>push</td>
+<td>Push a plugin to a registry</td>
+</tr>
+<tr class="row-even"><td>rm</td>
+<td>Remove one or more plugin</td>
+</tr>
+<tr class="row-odd"><td>set</td>
+<td>Change settings for a plugin</td>
+</tr>
+<tr class="row-even"><td>upgrade</td>
+<td>Upgrade an existing plugin</td>
+</tr>
+<tr class="row-odd"><td rowspan="4">secret</td>
+<td rowspan="4">Manage Docker secrets</td>
+<td>create</td>
+<td>Create a secret from a file or STDIN as content</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on onw or more secrets</td>
+</tr>
+<tr class="row-odd"><td>ls</td>
+<td>List secrets</td>
+</tr>
+<tr class="row-even"><td>rm</td>
+<td>Remove one or more secrets</td>
+</tr>
+<tr class="row-odd"><td rowspan="9">service</td>
+<td rowspan="9">Manage service</td>
+<td>create</td>
+<td>Create a new service</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on one or more services</td>
+</tr>
+<tr class="row-odd"><td>logs</td>
+<td>Fetch the logs of a  service or task</td>
+</tr>
+<tr class="row-even"><td>ls</td>
+<td>List services</td>
+</tr>
+<tr class="row-odd"><td>ps</td>
+<td>List the tasks of one or more services</td>
+</tr>
+<tr class="row-even"><td>rm</td>
+<td>Remove one or more services</td>
+</tr>
+<tr class="row-odd"><td>rollback</td>
+<td>Revert changes to a service’s configuration</td>
+</tr>
+<tr class="row-even"><td>scale</td>
+<td>Scale one or multiple replicated services</td>
+</tr>
+<tr class="row-odd"><td>update</td>
+<td>Update a service</td>
+</tr>
+<tr class="row-even"><td rowspan="9">stack</td>
+<td rowspan="9">Manage Docker stacks</td>
+<td>create</td>
+<td>Create a new service</td>
+</tr>
+<tr class="row-odd"><td>inspect</td>
+<td>Display detailed information on one or more services</td>
+</tr>
+<tr class="row-even"><td>logs</td>
+<td>Fetch the logs of a service or task</td>
+</tr>
+<tr class="row-odd"><td>ls</td>
+<td>List services</td>
+</tr>
+<tr class="row-even"><td>ps</td>
+<td>List the tasks of one or more services</td>
+</tr>
+<tr class="row-odd"><td>rm</td>
+<td>Remove one or more services</td>
+</tr>
+<tr class="row-even"><td>rollback</td>
+<td>Revert changes to a service’s configuration</td>
+</tr>
+<tr class="row-odd"><td>scale</td>
+<td>Scale one or multiple replicated services</td>
+</tr>
+<tr class="row-even"><td>update</td>
+<td>Update a services</td>
+</tr>
+<tr class="row-odd"><td rowspan="8">swarm</td>
+<td rowspan="8">Manage Swarm</td>
+<td>ca</td>
+<td>Display and rotate the root CA</td>
+</tr>
+<tr class="row-even"><td>init</td>
+<td>Initialize a swarm</td>
+</tr>
+<tr class="row-odd"><td>join</td>
+<td>Join a swarm as a node and/or manager</td>
+</tr>
+<tr class="row-even"><td>join-token</td>
+<td>Manager join tokens</td>
+</tr>
+<tr class="row-odd"><td>leave</td>
+<td>Leave the swarm</td>
+</tr>
+<tr class="row-even"><td>unlock</td>
+<td>Unlock swarm</td>
+</tr>
+<tr class="row-odd"><td>unlock-key</td>
+<td>Manage the unlock key</td>
+</tr>
+<tr class="row-even"><td>update</td>
+<td>Update the swarm</td>
+</tr>
+<tr class="row-odd"><td rowspan="4">system</td>
+<td rowspan="4">Manage Docker</td>
+<td>df</td>
+<td>Show docker disk usage</td>
+</tr>
+<tr class="row-even"><td>events</td>
+<td>Get real time events from the server</td>
+</tr>
+<tr class="row-odd"><td>info</td>
+<td>Display system-wide information</td>
+</tr>
+<tr class="row-even"><td>prune</td>
+<td>Remove unused data</td>
+</tr>
+<tr class="row-odd"><td rowspan="6">trust</td>
+<td rowspan="6">Manage trust on Docker images (experimental)</td>
+<td>key</td>
+<td>Manage keys for signing Docker images (experimental)</td>
+</tr>
+<tr class="row-even"><td>signer</td>
+<td>Manage entities who can sign Docker images (experimental)</td>
+</tr>
+<tr class="row-odd"><td>inspect</td>
+<td>Return low-level information about keys and signatures</td>
+</tr>
+<tr class="row-even"><td>revoke</td>
+<td>Remove trust for an image</td>
+</tr>
+<tr class="row-odd"><td>sign</td>
+<td>Sign an image</td>
+</tr>
+<tr class="row-even"><td>view</td>
+<td>Display detailed information about keys and signatures</td>
+</tr>
+<tr class="row-odd"><td rowspan="5">volume</td>
+<td rowspan="5">Manage volumes</td>
+<td>create</td>
+<td>Create a volume</td>
+</tr>
+<tr class="row-even"><td>inspect</td>
+<td>Display detailed information on one or more volumes</td>
+</tr>
+<tr class="row-odd"><td>ls</td>
+<td>List volumes</td>
+</tr>
+<tr class="row-even"><td>prune</td>
+<td>Remove all unused volumes</td>
+</tr>
+<tr class="row-odd"><td>rm</td>
+<td>Remove one or more volumes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h2>状态转换<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/docker_event_stats.jpg" src="../../_images/docker_event_stats.jpg" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, renkeju
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
