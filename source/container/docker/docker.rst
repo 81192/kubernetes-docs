@@ -8,3 +8,4 @@ Docker
 .. include:: /container/docker/data_volumes.rst
 .. include:: /container/docker/dockerfile.rst
 .. include:: /container/docker/dockerfile_detailed/dockerfile_detailed.rst
+.. include:: /container/docker/multi-stage_build.rst
