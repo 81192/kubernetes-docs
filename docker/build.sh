@@ -24,16 +24,17 @@ SPHINX_DIR=$(dirname "$PWD")
 HTML_DIR=$(find ${SPHINX_DIR} -name index.html -exec dirname {} \;)
 
 ## write docker compose
-cat << EOF > docker-compose.yaml
+cat << EOF > docker-compose.yml
 version: '3'
 services: 
 
   html:
     container_name: sphinx-kubernetes
+    network_mode: "none"
     image: sphinx:1.6.4-apline3.8
     build:
       context: .
-      dockerfile: Dockerfile.sphinx
+      dockerfile: Dockerfile
     volumes:
       - "${SPHINX_DIR}:/usr/src/sphinx"
     
@@ -48,7 +49,7 @@ services:
 EOF
 
 ## run container
-cd ${SPHINX_DIR}/docker/ && docker-compose -f docker-compose.yaml build
+cd ${SPHINX_DIR}/docker/ && docker-compose -f docker-compose.yml build
 }
 
 case $1 in

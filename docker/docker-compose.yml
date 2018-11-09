@@ -3,10 +3,11 @@ services:
 
   html:
     container_name: sphinx-kubernetes
+    network_mode: "none"
     image: sphinx:1.6.4-apline3.8
     build:
       context: .
-      dockerfile: Dockerfile.sphinx
+      dockerfile: Dockerfile
     volumes:
       - "/Users/renkeju/Documents/kubernetes-docs:/usr/src/sphinx"
     

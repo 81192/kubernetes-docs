@@ -111,6 +111,18 @@ docker 环境配置都可以由 ``/etc/docker/daemon.guess`` 这个文件所控�
             "log-level": "info"
         }
 
+    指定日志格式、大小和数量等。
+
+    .. code-block:: guess
+
+        {
+            "log-driver": "json-file",
+            "log-opts": {
+                "max-size": "5m",
+                "max-file": "5"
+            }
+        }
+
 * 监控 Prometheus
 
     https://docs.docker.com/engine/admin/prometheus/#configure-docker
@@ -139,6 +151,16 @@ docker 环境配置都可以由 ``/etc/docker/daemon.guess`` 这个文件所控�
     ..  code-block:: bash 
 
         $ sudo kill -SIGHUP $(pidof dockerd)
+
+* 信任私有仓库地址
+
+    docker 默认只信任 HTTPS 协议私有镜像仓库，如果搭建内网私有镜像仓库使用 HTTP 协议，需要指定信任仓库。
+
+    .. code-block:: guess
+
+        {
+            "insecure-registries": [ "10.10.172.203:5000" ]
+        }
 
 * 设置 镜像、容器、卷 存放目录和驱动
 
