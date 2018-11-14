@@ -11,4 +11,5 @@
 
    container/container
    deployment_guide/deployment_guide
-   
+   ceph/ceph
+   kubernetes/kubernetes
